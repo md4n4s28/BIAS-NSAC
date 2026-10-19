@@ -1,0 +1,20 @@
+import React, { Suspense, lazy } from 'react';
+import ReactDOM from 'react-dom/client';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { AuthProvider, Protected } from './lib/auth';
+import Layout from './components/Layout';
+import Home from './pages/Home';
+import Gallery from './pages/Gallery';
+import { About, Category, Certification, Contact, FAQ, Highlights, Schedule, Venue, WhyParticipate } from './pages/Public';
+import './styles.css';
+import './extra.css';
+import ErrorBoundary from './components/ErrorBoundary';
+const Quiz = lazy(() => import('./pages/Quiz'));
+const Auth = lazy(() => import('./pages/Auth'));
+const AuthCallback = lazy(() => import('./pages/AuthCallback'));
+const Register = lazy(() => import('./pages/Register'));
+const Dashboard = lazy(() => import('./pages/Dashboard'));
+const Verify = lazy(() => import('./pages/Verify'));
+const Admin = lazy(() => import('./pages/Admin'));
+function App() { return <BrowserRouter><AuthProvider><Suspense fallback={<div className="page loading-state">Preparing your next destination…</div>}><Routes><Route element={<Layout />}><Route index element={<Home />} /><Route path="about" element={<About />} /><Route path="highlights" element={<Highlights />} /><Route path="venue-schedule" element={<Schedule />} /><Route path="venue" element={<Venue />} /><Route path="certification" element={<Certification />} /><Route path="gallery" element={<Gallery />} /><Route path="why-participate" element={<WhyParticipate />} /><Route path="school" element={<Category category="school" />} /><Route path="college" element={<Category category="college" />} /><Route path="quiz" element={<Quiz />} /><Route path="faq" element={<FAQ />} /><Route path="contact" element={<Contact />} /><Route path="register" element={<Register />} /><Route path="login" element={<Auth />} /><Route path="signup" element={<Auth mode="signup" />} /><Route path="auth/callback" element={<AuthCallback />} /><Route path="forgot-password" element={<Auth mode="recover" />} /><Route path="reset-password" element={<Auth mode="reset" />} /><Route path="dashboard" element={<Protected><Dashboard /></Protected>} /><Route path="registration-details" element={<Protected><Dashboard /></Protected>} /><Route path="id-card" element={<Protected><Dashboard /></Protected>} /><Route path="verify" element={<Verify />} /><Route path="verify/:registrationId" element={<Verify />} /><Route path="admin/login" element={<Auth mode="admin" />} /><Route path="admin/*" element={<Protected admin><Admin /></Protected>} /><Route path="*" element={<div className="page"><h1>Outside this orbit.</h1><p>The page could not be found.</p><a className="button" href="/">Return home</a></div>} /></Route></Routes></Suspense></AuthProvider></BrowserRouter>; }
+ReactDOM.createRoot(document.getElementById('root')!).render(<React.StrictMode><ErrorBoundary><App /></ErrorBoundary></React.StrictMode>);

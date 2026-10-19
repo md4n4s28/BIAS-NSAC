@@ -1,0 +1,16 @@
+export const problemStatements = [
+  { difficulty: '01', title: 'Abandoned but not Forgotten: Storytelling about NASA’s Discarded Equipment on the Moon and Mars' },
+  { difficulty: '02', title: 'Be An Earth System Trend Detective!' },
+  { difficulty: '03', title: 'Build a Junior Astronaut Mission Trainer' },
+  { difficulty: '04', title: 'CLPS Lunar Mission Browser' },
+  { difficulty: '05', title: 'Create Health Monitoring Software for Astronauts on Space Missions' },
+  { difficulty: '06', title: 'Dancing with the SARs' },
+  { difficulty: '07', title: 'Field Shift: Adapting Farms with NASA Data' },
+  { difficulty: '08', title: 'Flame in Freefall: AI-Powered Fire Safety Insights from Microgravity Combustion Data' },
+  { difficulty: '09', title: 'Harmonization of MODIS and VIIRS Hot Spots' },
+  { difficulty: '10', title: 'Identify Earth Locations that Analog the Permanent Moon Base Locations and Mars' },
+  { difficulty: '11', title: 'Interplanetary Survival Guide: Martian Map' },
+  { difficulty: '12', title: 'Planet X and SPHEREx' },
+  { difficulty: '13', title: 'Space Mission Design Game' },
+  { difficulty: '14', title: 'The Earth Information Jukebox' },
+] as const;

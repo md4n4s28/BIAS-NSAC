@@ -7,4 +7,4 @@ dist/
 !.netlify/results.md
 *.zip
 !public/downloads/astroverse-source.zip
-.kilo/*
+.kilo/

@@ -360,8 +360,11 @@ export default function Dashboard() {
                 {submittingQuery ? 'Sending…' : 'Send message'}
               </button>
             </form>
-            {queryMessage && <p className="dashboard-query-success" role="status">{queryMessage}</p>}
-            {queries.length > 0 && (
+            {queryMessage && (
+              <div className="dashboard-query-feedback">
+                <Notice popup>{queryMessage}</Notice>
+              </div>
+            )}
               <div className="dashboard-query-history">
                 <h3>Your messages</h3>
                 {queries.map((query) => (

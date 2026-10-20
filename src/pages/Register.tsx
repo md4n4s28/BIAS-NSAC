@@ -264,9 +264,9 @@ export default function Register() {
                 <div className="registration-section-heading">
                   <span className="registration-step-number">02</span>
                   <div>
-                  <span className="eyebrow">TEAM MEMBERS</span>
-                  <h2>Every mind matters.</h2>
-                  <p>Add each participant’s details. The leader’s email is tied to this account.</p>
+                    <span className="eyebrow">TEAM MEMBERS</span>
+                    <h2>Every mind matters.</h2>
+                    <p>Add each participant’s details. The leader’s email is tied to this account.</p>
                   </div>
                 </div>
                 <span className="tag">{members.length} MEMBERS</span>
@@ -384,13 +384,7 @@ export default function Register() {
                   organizer confirmation.
                 </span>
               </label>
-              <p className="fine-print">
-                Names, emails, mobile numbers and institutions are stored
-                securely for registration administration. Public QR
-                verification shares only the team, institution, category and
-                registration status. Organizers must publish a retention policy
-                and final minor-consent process before opening registration.
-              </p>
+
               <button
                 className="button registration-submit"
                 disabled={busy || !settings.registrationOpen}

@@ -287,7 +287,7 @@ export default function Dashboard() {
             <p className="fine-print">Each participant has a unique registration ID. All participants on this team share the team ID.</p>
           </section>
 
-          
+
 
           <section className="panel dashboard-panel dashboard-challenge" id="problem-statement">
             <div>
@@ -365,6 +365,7 @@ export default function Dashboard() {
                 <Notice popup>{queryMessage}</Notice>
               </div>
             )}
+            {queries.length > 0 && (
               <div className="dashboard-query-history">
                 <h3>Your messages</h3>
                 {queries.map((query) => (

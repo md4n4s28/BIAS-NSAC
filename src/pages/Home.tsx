@@ -489,7 +489,7 @@ export default function Home() {
           <div className="radar-blip blip-1">
             <span className="blip-dot" />
             <span className="blip-ring" />
-            <span className="blip-tag">SAT-1</span>
+            <span className="blip-tag">NSAC</span>
           </div>
           <div className="radar-blip blip-2">
             <span className="blip-dot" />

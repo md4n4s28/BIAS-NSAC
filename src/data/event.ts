@@ -21,5 +21,5 @@ export const faqs = [
   { question: 'How do I register?', answer: 'Create an account, confirm your email, and submit your team information when registration opens. The team leader’s email must match the signed-in account.', category: 'Teams & registration' },
   { question: 'What should I bring?', answer: 'The organizer’s equipment and arrival checklist has not yet been confirmed. Check this page for updates.', category: 'Event details' },
   { question: 'How do certificates work?', answer: 'Eligibility, issuing authority and availability will be announced by the organizers. No certificates are issued or promised by this website.', category: 'Event details' },
-  { question: 'How do I access my ID and verify a registration?', answer: 'Sign in to your dashboard to view your saved registration and print a QR-enabled ID card. The QR link checks the real registration status without sharing private contact information.', category: 'Teams & registration' },
+  { question: 'How do I access my ID and verify a registration?', answer: 'Sign in to your dashboard to view your saved registration and print ID card. The QR link checks the real registration status without sharing private contact information.', category: 'Teams & registration' },
 ];

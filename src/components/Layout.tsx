@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Link, NavLink, Outlet, useLocation } from 'react-router-dom';
-import { ArrowUpRight, Menu, X, MapPin, UserRound, CalendarDays, Globe2 } from 'lucide-react';
+import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { ArrowLeft, ArrowUpRight, Menu, X, MapPin, UserRound, CalendarDays, Globe2 } from 'lucide-react';
 import type { SectionBackgroundName } from './SectionBackground';
 import { useAuth } from '../lib/auth';
 import { directionsUrl, officialUrl } from '../data/event';
@@ -25,8 +25,32 @@ const pageBackgrounds: Record<string, SectionBackgroundName> = {
 
 function RouteContent() {
   const { pathname } = useLocation();
+  const navigate = useNavigate();
+  const isHome = pathname === '/';
+
+  const handleBack = () => {
+    if (window.history.length > 1 && window.history.state && window.history.state.idx > 0) {
+      navigate(-1);
+    } else {
+      navigate('/');
+    }
+  };
+
   return (
-    <div className="route-surface">
+    <div className={`route-surface ${!isHome ? 'has-back-nav' : ''}`}>
+      {!isHome && (
+        <div className="page-back-bar">
+          <button
+            type="button"
+            className="page-back-button"
+            onClick={handleBack}
+            aria-label="Go back to previous page"
+          >
+            <ArrowLeft size={16} aria-hidden="true" />
+            <span>Back</span>
+          </button>
+        </div>
+      )}
       <Outlet />
     </div>
   );

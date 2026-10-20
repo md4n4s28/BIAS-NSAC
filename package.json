@@ -1,7 +1,7 @@
 {
-  "name": "astroverse",
+  "name": "bias-nsac",
   "version": "1.0.0",
-  "description": "",
+  "description": "BIAS-NSAC - NASA International Space Apps Challenge 2026 Portal (Birla Institute of Applied Sciences)",
   "main": "index.js",
   "scripts": {
     "dev": "vite",

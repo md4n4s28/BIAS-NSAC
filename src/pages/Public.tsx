@@ -14,12 +14,13 @@ import {
   MapPin,
   CalendarDays,
   ArrowUpRight,
+  Download,
   Mail,
   Phone,
   Send,
 } from 'lucide-react';
 import { ButtonLink, Notice, PageIntro } from '../components/UI';
-import { directionsUrl, officialRegistrationUrl, officialUrl, schedule, venueMapEmbedUrl } from '../data/event';
+import { directionsUrl, itineraryPdfUrl, officialRegistrationUrl, officialUrl, schedule, venueMapEmbedUrl } from '../data/event';
 
 export function About() {
   return (
@@ -156,15 +157,26 @@ export function Schedule() {
 
       <div className="schedule-overview">
         <div className="schedule-overview-item">
-          <CalendarDays size={19} aria-hidden="true" />
+          <CalendarDays size={18} aria-hidden="true" />
           <span><strong>14–16 November 2026</strong><small>Three days of collaboration</small></span>
         </div>
+        <a
+          className="schedule-itinerary-btn"
+          href={itineraryPdfUrl}
+          download="BIAS-NSAC-2026-Itinerary.pdf"
+          target="_blank"
+          rel="noreferrer"
+          title="Download the proposed event itinerary (PDF)"
+        >
+          <Download size={15} aria-hidden="true" />
+          <span>Download itinerary</span>
+        </a>
         <div className="schedule-overview-item">
-          <MapPin size={19} aria-hidden="true" />
+          <MapPin size={18} aria-hidden="true" />
           <span><strong>Birla Institute of Applied Sciences</strong><small>Bhimtal, Uttarakhand</small></span>
         </div>
         <a className="schedule-directions" href={directionsUrl} target="_blank" rel="noreferrer">
-          Get directions <ArrowUpRight size={16} aria-hidden="true" />
+          Get directions <ArrowUpRight size={15} aria-hidden="true" />
         </a>
       </div>
 
@@ -317,7 +329,7 @@ export function Certification() {
             <ButtonLink to={officialRegistrationUrl} external secondary>
               Register on NASA Space Apps
             </ButtonLink>
-            
+
           </div>
         </div>
         <figure className="certificate-example">
@@ -340,15 +352,15 @@ export function Category({ category }: { category: 'school' | 'college' }) {
   const title = school ? 'School Category' : 'College Category';
   const traits = school
     ? ([
-        [Lightbulb, 'Stay curious', 'Start with a question about Earth, space or the world around you.'],
-        [Users, 'Learn as a team', 'Bring different interests and ideas together as you explore a challenge.'],
-        [Presentation, 'Share your thinking', 'Explain the idea your team developed and how you approached the problem.'],
-      ] as const)
+      [Lightbulb, 'Stay curious', 'Start with a question about Earth, space or the world around you.'],
+      [Users, 'Learn as a team', 'Bring different interests and ideas together as you explore a challenge.'],
+      [Presentation, 'Share your thinking', 'Explain the idea your team developed and how you approached the problem.'],
+    ] as const)
     : ([
-        [Code2, 'Apply your skills', 'Bring technical, scientific, design or research perspectives to a real-world question.'],
-        [Network, 'Build collaboratively', 'Combine different strengths to explore data, test ideas and shape a solution.'],
-        [Presentation, 'Show the process', 'Present your project clearly, including the question, approach and outcome.'],
-      ] as const);
+      [Code2, 'Apply your skills', 'Bring technical, scientific, design or research perspectives to a real-world question.'],
+      [Network, 'Build collaboratively', 'Combine different strengths to explore data, test ideas and shape a solution.'],
+      [Presentation, 'Show the process', 'Present your project clearly, including the question, approach and outcome.'],
+    ] as const);
 
   return (
     <main className={`page category-page ${school ? 'school-category-page' : 'college-category-page'}`}>
@@ -462,7 +474,7 @@ export function WhyParticipate() {
           </article>
         ))}
       </div>
-      
+
       <ButtonLink to="/register">Take the first step</ButtonLink>
     </div>
   );

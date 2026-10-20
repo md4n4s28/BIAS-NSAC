@@ -76,7 +76,7 @@ create table if not exists public.admin_users (
 create table if not exists public.registrations (
   id bigint generated always as identity primary key,
   reference text not null unique default public.next_team_reference(),
-  owner_id uuid not null unique references auth.users(id),
+  owner_id uuid not null unique references auth.users(id) on delete cascade,
   team_name text not null check (length(trim(team_name)) between 2 and 100),
   institution text not null check (length(trim(institution)) between 2 and 200),
   category text not null check (category in ('school', 'college')),

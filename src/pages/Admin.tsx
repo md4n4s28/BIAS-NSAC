@@ -68,7 +68,7 @@ function exportCsv(records: Registration[]) {
 
   const anchor = document.createElement('a');
   anchor.href = url;
-  anchor.download = `astroverse-registrations-${new Date()
+  anchor.download = `NSAC-registrations-${new Date()
     .toISOString()
     .slice(0, 10)}.csv`;
   anchor.click();

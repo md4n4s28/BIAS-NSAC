@@ -95,10 +95,11 @@ COLLEGE_PORTAL-main/
 
 ## Supabase Database Configuration
 
-To set up the database and backend functions:
+To set up the database and backend functions for a fresh Supabase project:
 
 1. Create a project in [Supabase](https://supabase.com).
-2. In the Supabase **SQL Editor**, run the migration scripts located in `supabase/migrations/` in chronological order:
+2. **Quickest Setup (Recommended):** Open the Supabase **SQL Editor**, copy the contents of [`supabase/database-code/complete_schema.sql`](./supabase/database-code/complete_schema.sql), and run it. This provisions all tables, sequences, functions, triggers, and RLS policies in one go. See [`supabase/database-code/README.md`](./supabase/database-code/README.md) for full instructions.
+3. **Alternative (Incremental Migrations):** Alternatively, you can run each script in `supabase/migrations/` in chronological order:
    - `20261019140000_create_astroverse_portal.sql` — Sets up core schema, tables, RLS policies, atomic `register_team` function, and audit triggers.
    - `20261019150000_restrict_admin_to_designated_email.sql` — Secures admin role checks to confirmed organizer accounts.
    - `20261019170000_registration_problem_and_participant_ids.sql` — Adds problem statement selection and formatted team/participant IDs.

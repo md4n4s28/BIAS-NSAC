@@ -22,6 +22,7 @@ import {
   Lightbulb,
   Trophy,
   Network,
+  Radio,
 } from 'lucide-react';
 import { ButtonLink, SectionHeading } from '../components/UI';
 import { directionsUrl, gallery, officialUrl, schedule, venueMapEmbedUrl } from '../data/event';
@@ -361,24 +362,55 @@ export default function Home() {
         </SectionHeading>
         <div className="category-grid">
           <Link to="/school" className="category-card">
-            <School size={32} />
-            <span className="micro-label">FOR THE NEXT GENERATION</span>
-            <h3>School Category</h3>
-            <p>Put your curiosity to work with science, logic, creativity and teamwork.</p>
-            <span className="arrow-link">
-              Find your starting point <ArrowUpRight size={19} />
-            </span>
-            <div className="category-orb" />
+            <div className="category-content">
+              <div className="category-icon-box">
+                <School size={28} />
+              </div>
+              <span className="micro-label">FOR THE NEXT GENERATION</span>
+              <h3>School Category</h3>
+              <p>Put your curiosity to work with science, logic, creativity and teamwork.</p>
+              <span className="arrow-link">
+                Find your starting point <ArrowUpRight size={18} />
+              </span>
+            </div>
+            <div className="category-orbit-visual" aria-hidden="true">
+              <span className="category-orbit-halo" />
+              <span className="category-orbit-ring category-orbit-ring-one" />
+              <span className="category-orbit-ring category-orbit-ring-two" />
+              <span className="category-orbit-core"><Sparkles size={22} strokeWidth={1.4} /></span>
+              <span className="category-orbit-node category-orbit-node-one"><Globe2 size={14} /></span>
+              <span className="category-orbit-node category-orbit-node-two"><Lightbulb size={14} /></span>
+              <span className="category-orbit-node category-orbit-node-three"><Users size={14} /></span>
+              <span className="category-orbit-star category-orbit-star-one" />
+              <span className="category-orbit-star category-orbit-star-two" />
+              <span className="category-orbit-star category-orbit-star-three" />
+            </div>
           </Link>
           <Link to="/college" className="category-card college">
-            <GraduationCap size={32} />
-            <span className="micro-label">FOR TOMORROW'S PROBLEM-SOLVERS</span>
-            <h3>College Category</h3>
-            <p>Turn technical skills and bold ideas into real-world solutions.</p>
-            <span className="arrow-link">
-              Build your next big idea <ArrowUpRight size={19} />
-            </span>
-            <div className="category-orb" />
+            <div className="category-content">
+              <div className="category-icon-box">
+                <GraduationCap size={28} />
+              </div>
+              <span className="micro-label">FOR TOMORROW'S PROBLEM-SOLVERS</span>
+              <h3>College Category</h3>
+              <p>Turn technical skills and bold ideas into real-world solutions.</p>
+              <span className="arrow-link">
+                Build your next big idea <ArrowUpRight size={18} />
+              </span>
+            </div>
+            <div className="category-orbit-visual category-orbit-college" aria-hidden="true">
+              <span className="category-orbit-halo" />
+              <span className="category-orbit-ring category-orbit-ring-one" />
+              <span className="category-orbit-ring category-orbit-ring-two" />
+              <span className="category-orbit-ring category-orbit-ring-three" />
+              <span className="category-orbit-core"><Atom size={24} strokeWidth={1.4} /></span>
+              <span className="category-orbit-node category-orbit-node-one"><Code2 size={14} /></span>
+              <span className="category-orbit-node category-orbit-node-two"><Rocket size={14} /></span>
+              <span className="category-orbit-node category-orbit-node-three"><Globe2 size={14} /></span>
+              <span className="category-orbit-star category-orbit-star-one" />
+              <span className="category-orbit-star category-orbit-star-two" />
+              <span className="category-orbit-star category-orbit-star-three" />
+            </div>
           </Link>
         </div>
       </section>
@@ -445,17 +477,42 @@ export default function Home() {
             A remarkable setting for remarkable ideas <ArrowUpRight size={18} />
           </Link>
         </div>
-        <div className="organizer-visual" aria-hidden="true">
-          <span className="organizer-visual-halo" />
-          <span className="organizer-visual-orbit organizer-visual-orbit-one" />
-          <span className="organizer-visual-orbit organizer-visual-orbit-two" />
-          <span className="organizer-visual-core"><Atom size={34} strokeWidth={1.2} /></span>
-          <span className="organizer-visual-node organizer-visual-node-one"><Globe2 size={18} /></span>
-          <span className="organizer-visual-node organizer-visual-node-two"><Lightbulb size={17} /></span>
-          <span className="organizer-visual-node organizer-visual-node-three"><Users size={17} /></span>
-          <span className="organizer-visual-star organizer-visual-star-one" />
-          <span className="organizer-visual-star organizer-visual-star-two" />
-          <span className="organizer-visual-star organizer-visual-star-three" />
+        <div className="organizer-radar-visual" aria-hidden="true">
+          <div className="radar-casing" />
+          <div className="radar-ring radar-ring-3" />
+          <div className="radar-ring radar-ring-2" />
+          <div className="radar-ring radar-ring-1" />
+          <div className="radar-axis radar-axis-h" />
+          <div className="radar-axis radar-axis-v" />
+          <div className="radar-sweep" />
+
+          <div className="radar-blip blip-1">
+            <span className="blip-dot" />
+            <span className="blip-ring" />
+            <span className="blip-tag">SAT-1</span>
+          </div>
+          <div className="radar-blip blip-2">
+            <span className="blip-dot" />
+            <span className="blip-ring" />
+            <span className="blip-tag">BIAS</span>
+          </div>
+          <div className="radar-blip blip-3">
+            <span className="blip-dot" />
+            <span className="blip-ring" />
+          </div>
+
+          <div className="radar-center-beacon">
+            <span className="beacon-wave wave-1" />
+            <span className="beacon-wave wave-2" />
+            <div className="beacon-core">
+              <Radio size={20} />
+            </div>
+          </div>
+
+          <span className="radar-cardinal cardinal-n">000°</span>
+          <span className="radar-cardinal cardinal-e">090°</span>
+          <span className="radar-cardinal cardinal-s">180°</span>
+          <span className="radar-cardinal cardinal-w">270°</span>
         </div>
       </section>
 

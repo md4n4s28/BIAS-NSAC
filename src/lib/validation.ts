@@ -8,6 +8,7 @@ export const memberSchema = z.object({
 });
 export const registrationSchema = z.object({
   teamName: z.string().trim().min(2).max(100), institution: z.string().trim().min(2).max(200),
+  participationMode: z.enum(['offline', 'online']).default('offline'),
   problemStatement: z.string().trim().min(3).max(240),
   category: z.enum(['school', 'college']), mentor: z.string().trim().max(120).optional(),
   consent: z.literal(true, { error: 'Consent is required.' }), members: z.array(memberSchema).min(1).max(20),

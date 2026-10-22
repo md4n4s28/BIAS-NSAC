@@ -1876,3 +1876,6 @@ body{background-color:#08090B;background-image:linear-gradient(rgba(8,9,11,.4),r
 .countdown-tagline{color:#ddd4bd}
 .countdown-unit-seconds strong{color:#f5d76e}
 .countdown-timezone{border-color:rgba(229,185,56,.2);color:#c6b77d}
+.admin-filters{display:grid;grid-template-columns:minmax(220px,2fr) repeat(3,minmax(130px,1fr));gap:15px;margin:25px 0}
+@media(max-width:900px){.admin-filters{grid-template-columns:1fr 1fr}}
+@media(max-width:540px){.admin-filters{grid-template-columns:1fr}}

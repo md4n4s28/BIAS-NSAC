@@ -32,6 +32,7 @@ function exportCsv(records: Registration[]) {
       'Participant ID',
       'Institution',
       'Category',
+      'Mode',
       'Status',
       'Participant',
       'Role',
@@ -46,6 +47,7 @@ function exportCsv(records: Registration[]) {
         member.registrationId,
         member.institution,
         record.category,
+        record.participationMode ?? 'offline',
         record.status,
         member.name,
         member.role,
@@ -87,6 +89,7 @@ export default function Admin() {
   const [search, setSearch] = useState('');
   const [status, setStatus] = useState('');
   const [category, setCategory] = useState('');
+  const [modeFilter, setModeFilter] = useState('');
   const [selected, setSelected] = useState<Registration | null>(null);
   const [expandedQueryId, setExpandedQueryId] = useState<number | null>(null);
   const [deleteQueryId, setDeleteQueryId] = useState<number | null>(null);
@@ -136,6 +139,7 @@ export default function Admin() {
     (record) =>
       (!status || record.status === status) &&
       (!category || record.category === category) &&
+      (!modeFilter || (record.participationMode ?? 'offline') === modeFilter) &&
       JSON.stringify(record)
         .toLowerCase()
         .includes(search.toLowerCase())
@@ -176,6 +180,31 @@ export default function Admin() {
       );
       if (selected?.id === record.id) setSelected({ ...record, status: value });
       setMessage(`${record.teamId} marked ${value === 'approved' ? 'verified' : value}.`);
+    } catch (error) {
+      setError((error as Error).message);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function changeMode(
+    record: Registration,
+    value: 'offline' | 'online'
+  ) {
+    setBusy(true);
+    setError('');
+    try {
+      await api(`admin/registrations/${record.teamId}`, {
+        method: 'PATCH',
+        body: JSON.stringify({ participationMode: value }),
+      });
+      setRecords((current) =>
+        current.map((item) =>
+          item.id === record.id ? { ...item, participationMode: value } : item
+        )
+      );
+      if (selected?.id === record.id) setSelected({ ...record, participationMode: value });
+      setMessage(`${record.teamId} mode changed to ${value === 'offline' ? 'Offline (Onsite)' : 'Online (Virtual)'}.`);
     } catch (error) {
       setError((error as Error).message);
     } finally {
@@ -632,6 +661,11 @@ export default function Admin() {
                 <option value="school">School</option>
                 <option value="college">College</option>
               </select>
+              <select aria-label="Filter by participation mode" value={modeFilter} onChange={(event) => setModeFilter(event.target.value)}>
+                <option value="">All modes</option>
+                <option value="offline">Offline (Onsite)</option>
+                <option value="online">Online (Virtual)</option>
+              </select>
             </div>
 
             {!visible.length ? (
@@ -649,6 +683,7 @@ export default function Admin() {
                       <th>{section === 'participants' ? 'Participant' : 'Team name'}</th>
                       <th>Institution</th>
                       <th>Category</th>
+                      <th>Mode</th>
                       <th>Verification</th>
                       <th>Manage</th>
                     </tr>
@@ -661,6 +696,18 @@ export default function Admin() {
                           <td>{member?.name ?? record.teamName}{member && <small>{member.email}</small>}</td>
                           <td>{member?.institution ?? record.institution}</td>
                           <td>{record.category}</td>
+                          <td>
+                            <select
+                              className="admin-status-select"
+                              aria-label={`Set participation mode for ${record.teamName}`}
+                              value={record.participationMode ?? 'offline'}
+                              disabled={busy}
+                              onChange={(event) => void changeMode(record, event.target.value as 'offline' | 'online')}
+                            >
+                              <option value="offline">Offline</option>
+                              <option value="online">Online</option>
+                            </select>
+                          </td>
                           <td>
                             <select
                               className="admin-status-select"
@@ -709,7 +756,7 @@ export default function Admin() {
                 </button>
               </div>
               <p>
-                {selected.institution} · {selected.category} category
+                {selected.institution} · {selected.category} category · <span style={{ color: selected.participationMode === 'online' ? '#64D7FF' : '#f5d76e', fontWeight: 600 }}>{selected.participationMode === 'online' ? 'Online (Virtual)' : 'Offline (Onsite at BIAS Bhimtal)'}</span>
               </p>
               <p><strong>Problem statement:</strong> {selected.problemStatement}</p>
               {selected.mentor && <p>Mentor: {selected.mentor}</p>}
@@ -753,6 +800,17 @@ export default function Admin() {
               />
 
               <div className="admin-detail-actions">
+                <label className="admin-status-control">
+                  Participation mode
+                  <select
+                    value={selected.participationMode ?? 'offline'}
+                    disabled={busy}
+                    onChange={(event) => void changeMode(selected, event.target.value as 'offline' | 'online')}
+                  >
+                    <option value="offline">Offline (Onsite at BIAS Bhimtal)</option>
+                    <option value="online">Online (Virtual)</option>
+                  </select>
+                </label>
                 <label className="admin-status-control">
                   Verification status
                   <select

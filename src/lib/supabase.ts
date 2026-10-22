@@ -13,6 +13,7 @@ type RegistrationRow = {
   mentor: string | null;
   status: 'pending' | 'approved' | 'rejected';
   member_count: number;
+  participation_mode: 'offline' | 'online';
   consent_version: string;
   created_at: string;
   deleted_at: string | null;
@@ -101,6 +102,7 @@ export interface Database {
           p_problem_statement: string;
           p_members: Json;
           p_consent: boolean;
+          p_participation_mode?: 'offline' | 'online';
         };
         Returns: RegistrationRow;
       };

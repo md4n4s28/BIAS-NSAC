@@ -84,6 +84,7 @@ create table if not exists public.registrations (
   problem_statement text not null,
   status text not null default 'pending' check (status in ('pending', 'approved', 'rejected')),
   member_count integer not null check (member_count between 1 and 20),
+  participation_mode text not null default 'offline' check (participation_mode in ('offline', 'online')),
   consent_version text not null default '2026-01',
   deleted_at timestamptz,
   created_at timestamptz not null default now()
@@ -255,7 +256,8 @@ create or replace function public.register_team(
   p_mentor text,
   p_problem_statement text,
   p_members jsonb,
-  p_consent boolean
+  p_consent boolean,
+  p_participation_mode text default 'offline'
 )
 returns public.registrations
 language plpgsql
@@ -270,6 +272,7 @@ declare
   leader_total integer;
   leader_email text;
   saved_registration public.registrations%rowtype;
+  resolved_mode text := coalesce(lower(trim(p_participation_mode)), 'offline');
 begin
   if current_user_id is null then
     raise exception 'Sign in with a confirmed team leader account to continue.'
@@ -372,11 +375,15 @@ begin
       using errcode = '23514';
   end if;
 
+  if resolved_mode not in ('offline', 'online') then
+    resolved_mode := 'offline';
+  end if;
+
   insert into public.registrations (
-    owner_id, team_name, institution, category, mentor, problem_statement, member_count
+    owner_id, team_name, institution, category, mentor, problem_statement, member_count, participation_mode
   ) values (
     current_user_id, trim(p_team_name), trim(p_institution), p_category,
-    nullif(trim(coalesce(p_mentor, '')), ''), p_problem_statement, member_total
+    nullif(trim(coalesce(p_mentor, '')), ''), p_problem_statement, member_total, resolved_mode
   )
   returning * into saved_registration;
 
@@ -509,7 +516,8 @@ begin
       institution = trim(p_team->>'institution'),
       category = p_team->>'category',
       mentor = nullif(trim(coalesce(p_team->>'mentor', '')), ''),
-      problem_statement = trim(p_team->>'problem_statement')
+      problem_statement = trim(p_team->>'problem_statement'),
+      participation_mode = coalesce(nullif(lower(trim(p_team->>'participation_mode')), ''), saved_registration.participation_mode)
   where id = saved_registration.id
   returning * into saved_registration;
 
@@ -772,8 +780,8 @@ grant select on public.audit to authenticated;
 revoke all on function public.is_admin() from public, anon;
 grant execute on function public.is_admin() to authenticated;
 
-revoke all on function public.register_team(text, text, text, text, text, jsonb, boolean) from public, anon;
-grant execute on function public.register_team(text, text, text, text, text, jsonb, boolean) to authenticated;
+revoke all on function public.register_team(text, text, text, text, text, jsonb, boolean, text) from public, anon;
+grant execute on function public.register_team(text, text, text, text, text, jsonb, boolean, text) to authenticated;
 
 revoke all on function public.admin_update_team(text, jsonb, jsonb) from public, anon;
 grant execute on function public.admin_update_team(text, jsonb, jsonb) to authenticated;

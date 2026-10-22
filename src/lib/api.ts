@@ -12,6 +12,7 @@ export type Registration = {
   problemStatement: string;
   institution: string;
   category: 'school' | 'college';
+  participationMode: 'offline' | 'online';
   status: 'pending' | 'approved' | 'rejected';
   mentor?: string;
   createdAt: string;
@@ -90,6 +91,7 @@ function mapRegistration(
     problemStatement: row.problem_statement,
     institution: row.institution,
     category: row.category,
+    participationMode: (row.participation_mode ?? 'offline') as 'offline' | 'online',
     status: row.status,
     mentor: row.mentor ?? undefined,
     createdAt: row.created_at,
@@ -172,7 +174,7 @@ export async function api<T>(path: string, init: RequestInit = {}): Promise<T> {
       throw new Error(parsed.error.issues.map((issue) => issue.message).join(' '));
     }
     const input = parsed.data;
-    const { data, error } = await supabase.rpc('register_team', {
+    let rpcResult = await supabase.rpc('register_team', {
       p_team_name: input.teamName,
       p_institution: input.institution,
       p_category: input.category,
@@ -186,8 +188,41 @@ export async function api<T>(path: string, init: RequestInit = {}): Promise<T> {
         role: member.role,
       })),
       p_consent: input.consent,
+      p_participation_mode: input.participationMode,
     });
-    if (error) fail(error);
+
+    if (
+      rpcResult.error &&
+      (rpcResult.error.message.includes('p_participation_mode') ||
+        rpcResult.error.code === 'PGRST202')
+    ) {
+      rpcResult = await supabase.rpc('register_team', {
+        p_team_name: input.teamName,
+        p_institution: input.institution,
+        p_category: input.category,
+        p_mentor: input.mentor || null,
+        p_problem_statement: input.problemStatement,
+        p_members: input.members.map((member) => ({
+          name: member.name,
+          email: member.email,
+          mobile: member.mobile,
+          institution: member.institution,
+          role: member.role,
+        })),
+        p_consent: input.consent,
+      });
+
+      if (!rpcResult.error && rpcResult.data && input.participationMode) {
+        await supabase
+          .from('registrations')
+          .update({ participation_mode: input.participationMode })
+          .eq('id', rpcResult.data.id);
+        rpcResult.data.participation_mode = input.participationMode;
+      }
+    }
+
+    if (rpcResult.error) fail(rpcResult.error);
+    const data = rpcResult.data;
     if (data.owner_id !== user.id) throw new Error('The registration owner could not be verified.');
     return mapRegistration(data) as T;
   }
@@ -411,6 +446,7 @@ export async function api<T>(path: string, init: RequestInit = {}): Promise<T> {
             category: String(body.category),
             mentor: body.mentor,
             problem_statement: body.problemStatement,
+            participation_mode: typeof body.participationMode === 'string' ? body.participationMode : undefined,
           },
           p_members: body.members,
         });
@@ -423,6 +459,12 @@ export async function api<T>(path: string, init: RequestInit = {}): Promise<T> {
           throw new Error('Choose a valid registration status.');
         }
         patch.status = body.status as RegistrationRow['status'];
+      }
+      if (typeof body.participationMode === 'string') {
+        if (!['offline', 'online'].includes(body.participationMode)) {
+          throw new Error('Choose a valid participation mode (offline or online).');
+        }
+        patch.participation_mode = body.participationMode as RegistrationRow['participation_mode'];
       }
       if (typeof body.teamName === 'string') patch.team_name = body.teamName;
       if (typeof body.institution === 'string') patch.institution = body.institution;

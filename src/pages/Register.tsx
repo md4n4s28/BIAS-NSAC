@@ -38,6 +38,7 @@ export default function Register() {
   const [category, setCategory] = useState(
     params.get('category') === 'school' ? 'school' : 'college'
   );
+  const [mode, setMode] = useState<'offline' | 'online'>('offline');
 
   useEffect(() => {
     api<Settings>('config')
@@ -100,6 +101,7 @@ export default function Register() {
     const parsed = registrationSchema.safeParse({
       teamName: data.get('teamName'),
       institution,
+      participationMode: mode,
       problemStatement: data.get('problemStatement'),
       category,
       mentor: data.get('mentor'),
@@ -242,6 +244,19 @@ export default function Register() {
                     <option value="school">School Category</option>
                     <option value="college">College Category</option>
                   </select>
+                </label>
+                <label>
+                  Mode of participation
+                  <select
+                    name="participationMode"
+                    value={mode}
+                    onChange={(event) => setMode(event.target.value as 'offline' | 'online')}
+                    required
+                  >
+                    <option value="offline">Offline (Onsite at BIAS Bhimtal)</option>
+                    <option value="online">Online (Virtual)</option>
+                  </select>
+                  <span className="registration-field-help">Selected offline teams are eligible for hostel accommodation on limited availability.</span>
                 </label>
                 <label>
                   Mentor name (optional)

@@ -258,9 +258,10 @@ export default function Dashboard() {
             </div>
             <dl className="dashboard-team-meta">
               <div><dt>Team ID</dt><dd>{registration.teamId}</dd></div>
+              <div><dt>Participation Mode</dt><dd>{registration.participationMode === 'online' ? 'Online (Virtual)' : 'Offline (Onsite at BIAS Bhimtal)'}</dd></div>
+              <div><dt>Institution Category</dt><dd>{registration.category}</dd></div>
               <div><dt>Mentor</dt><dd>{registration.mentor || 'Not provided'}</dd></div>
               <div><dt>Event dates</dt><dd>14–16 November 2026</dd></div>
-              <div><dt>Institution Category</dt><dd>{registration.category}</dd></div>
             </dl>
             <div className="table-wrap">
               <table>

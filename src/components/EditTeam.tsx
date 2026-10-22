@@ -27,6 +27,7 @@ export default function EditTeam({
           teamName: data.get('teamName'),
           institution: data.get('institution'),
           category: data.get('category'),
+          participationMode: data.get('participationMode'),
           mentor: data.get('mentor'),
           problemStatement: data.get('problemStatement'),
           members: record.members.map((member) => ({
@@ -66,6 +67,13 @@ export default function EditTeam({
           <select name="category" defaultValue={record.category} required>
             <option value="school">School</option>
             <option value="college">College</option>
+          </select>
+        </label>
+        <label>
+          Mode of participation
+          <select name="participationMode" defaultValue={record.participationMode ?? 'offline'} required>
+            <option value="offline">Offline (Onsite at BIAS Bhimtal)</option>
+            <option value="online">Online (Virtual)</option>
           </select>
         </label>
         <label>

@@ -641,7 +641,7 @@ export default function Quiz() {
               <div className="quiz-multi-grid">
                 {currentQuestion.options.map((opt, optIdx) => {
                   const isSelected =
-                    Array.isArray(currentAnswer) && currentAnswer.includes(optIdx);
+                    Array.isArray(currentAnswer) && (currentAnswer as number[]).includes(optIdx);
                   const isCorrect = currentQuestion.answer.includes(optIdx);
 
                   let multiClass = 'quiz-multi-card';

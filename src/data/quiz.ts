@@ -274,7 +274,8 @@ export function checkAnswer(question: QuizQuestion, answer: UserAnswerValue): bo
 
     case 'multi': {
       if (!Array.isArray(answer)) return false;
-      const sortedUser = [...answer].sort((a, b) => a - b);
+      const userList = answer as number[];
+      const sortedUser = [...userList].sort((a, b) => a - b);
       const sortedAns = [...question.answer].sort((a, b) => a - b);
       if (sortedUser.length !== sortedAns.length) return false;
       return sortedUser.every((val, idx) => val === sortedAns[idx]);
@@ -282,8 +283,9 @@ export function checkAnswer(question: QuizQuestion, answer: UserAnswerValue): bo
 
     case 'sequence': {
       if (!Array.isArray(answer)) return false;
-      if (answer.length !== question.correctOrder.length) return false;
-      return answer.every((val, idx) => val === question.correctOrder[idx]);
+      const userList = answer as string[];
+      if (userList.length !== question.correctOrder.length) return false;
+      return userList.every((val, idx) => val === question.correctOrder[idx]);
     }
 
     case 'match': {

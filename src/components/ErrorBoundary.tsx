@@ -1,6 +1,6 @@
 import { Component, type ErrorInfo, type ReactNode } from 'react';
 export default class ErrorBoundary extends Component<{ children: ReactNode }, { failed: boolean; error: Error | null }> {
-  state = { failed: false, error: null };
+  state: { failed: boolean; error: Error | null } = { failed: false, error: null };
   static getDerivedStateFromError(error: Error) { return { failed: true, error }; }
   componentDidCatch(error: Error, info: ErrorInfo) {
     console.error('ErrorBoundary caught an unhandled component error:', error, info);

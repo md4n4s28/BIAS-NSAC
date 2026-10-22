@@ -429,8 +429,7 @@ export function Category({ category }: { category: 'school' | 'college' }) {
       </section>
 
       <Notice>
-        The organizers have not confirmed all eligibility boundaries, category
-        policies or participation fees. No payment is collected by this website;
+        No payment is collected by this website;
         check the FAQ or contact the organizers for confirmed updates.
       </Notice>
 

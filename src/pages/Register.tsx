@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { Plus, Trash2, ArrowRight, ShieldCheck } from 'lucide-react';
 import { useAuth } from '../lib/auth';
 import { api, type Registration, type Settings } from '../lib/api';
@@ -21,6 +21,7 @@ const emptyMember = (
 export default function Register() {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [params] = useSearchParams();
 
   const [settings, setSettings] = useState<Settings | null>(null);
@@ -63,7 +64,10 @@ export default function Register() {
     let active = true;
     api<Registration | null>('registration')
       .then((registration) => {
-        if (active && registration) navigate('/dashboard', { replace: true });
+        if (active && registration) {
+          const isJustLoggedIn = Boolean((location.state as { loggedIn?: boolean } | null)?.loggedIn);
+          navigate('/dashboard', { replace: true, state: isJustLoggedIn ? { loggedIn: true } : {} });
+        }
       })
       .catch((caught: unknown) => {
         if (active) {
@@ -127,7 +131,7 @@ export default function Register() {
         method: 'POST',
         body: JSON.stringify(parsed.data),
       });
-      navigate('/dashboard');
+      navigate('/dashboard', { state: { registered: true } });
     } catch (error) {
       setError((error as Error).message);
     } finally {

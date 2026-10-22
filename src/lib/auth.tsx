@@ -131,7 +131,7 @@ export function Protected({ children, admin = false }: { children: ReactNode; ad
   const location = useLocation();
 
   if (loading) return <div className="page loading-state">Connecting to mission control…</div>;
-  if (!user) return <Navigate to={admin ? '/admin/login' : '/login'} state={{ from: location.pathname }} replace />;
+  if (!user) return <Navigate to="/login" state={{ from: location.pathname }} replace />;
   if (!user.email_confirmed_at) {
     return (
       <div className="page">

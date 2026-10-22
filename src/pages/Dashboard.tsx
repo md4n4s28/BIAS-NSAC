@@ -195,7 +195,11 @@ export default function Dashboard() {
         One place for your team record, selected challenge, and participant ID cards.
       </PageIntro>
 
-      {error && <Notice error>{error}</Notice>}
+      {Boolean((location.state as { registered?: boolean } | null)?.registered) && (
+        <Notice popup>Team registration submitted successfully! Your application is now in review.</Notice>
+      )}
+      {queryMessage && <Notice popup>{queryMessage}</Notice>}
+      {error && <Notice error popup>{error}</Notice>}
 
       {loading ? (
         <div className="panel loading-state">Retrieving your registration…</div>

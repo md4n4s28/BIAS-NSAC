@@ -16,10 +16,12 @@ export function Notice({
   children,
   error = false,
   popup = error,
+  toastOnly = false,
 }: {
   children: ReactNode;
   error?: boolean;
   popup?: boolean;
+  toastOnly?: boolean;
 }) {
   const [visible, setVisible] = useState(true);
   const timerRef = useRef<number | null>(null);
@@ -46,9 +48,11 @@ export function Notice({
 
   return (
     <>
-      <div role={error ? 'alert' : 'status'} className={`notice ${error ? 'error' : ''}`}>
-        {children}
-      </div>
+      {!toastOnly && (
+        <div role={error ? 'alert' : 'status'} className={`notice ${error ? 'error' : ''}`}>
+          {children}
+        </div>
+      )}
       {popup && visible && typeof document !== 'undefined' && createPortal(
         <div className="toast-portal-container" role="region" aria-label="Notifications">
           <div

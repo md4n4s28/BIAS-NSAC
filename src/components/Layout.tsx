@@ -4,6 +4,7 @@ import { ArrowLeft, ArrowUpRight, Menu, X, MapPin, UserRound, CalendarDays, Glob
 import type { SectionBackgroundName } from './SectionBackground';
 import { useAuth } from '../lib/auth';
 import { directionsUrl, officialUrl } from '../data/event';
+import { Notice } from './UI';
 
 const pageBackgrounds: Record<string, SectionBackgroundName> = {
   '/about': 'mission',
@@ -60,13 +61,18 @@ export default function Layout() {
   const [open, setOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [accountError, setAccountError] = useState('');
+  const [loginToast, setLoginToast] = useState(false);
+  const [logoutToast, setLogoutToast] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
   const { user, isAdmin, signOut, callbackError } = useAuth();
 
   async function handleSignOut() {
     setAccountError('');
     try {
       await signOut();
+      setProfileOpen(false);
+      navigate('/login?logged_out=1', { replace: true, state: { loggedOut: true } });
     } catch (error) {
       setAccountError(error instanceof Error ? error.message : 'Could not sign out. Please try again.');
     } finally {
@@ -79,6 +85,32 @@ export default function Layout() {
     setProfileOpen(false);
     window.scrollTo(0, 0);
   }, [location.pathname]);
+
+  useEffect(() => {
+    if ((location.state as { loggedIn?: boolean } | null)?.loggedIn) {
+      setLoginToast(true);
+      const stateCopy = { ...(location.state as Record<string, unknown>) };
+      delete stateCopy.loggedIn;
+      navigate(location.pathname + location.search + location.hash, {
+        replace: true,
+        state: stateCopy,
+      });
+    } else if (
+      (location.state as { loggedOut?: boolean } | null)?.loggedOut ||
+      new URLSearchParams(location.search).get('logged_out') === '1'
+    ) {
+      setLogoutToast(true);
+      const stateCopy = { ...(location.state as Record<string, unknown>) };
+      delete stateCopy.loggedOut;
+      const params = new URLSearchParams(location.search);
+      params.delete('logged_out');
+      const newSearch = params.toString() ? `?${params.toString()}` : '';
+      navigate(location.pathname + newSearch + location.hash, {
+        replace: true,
+        state: stateCopy,
+      });
+    }
+  }, [location.state, location.pathname, location.search, location.hash, navigate]);
 
   return (
     <>
@@ -162,6 +194,12 @@ export default function Layout() {
         </nav>
       </header>
       <main id="main">
+        {loginToast && (
+          <Notice popup toastOnly>Account login successful.</Notice>
+        )}
+        {logoutToast && (
+          <Notice popup toastOnly>Account logged out successfully.</Notice>
+        )}
         {(callbackError || accountError) && (
           <div className="auth-callback-notice" role="alert">{callbackError || accountError}</div>
         )}
@@ -209,7 +247,6 @@ export default function Layout() {
 
         <div className="footer-bottom">
           <span>Organized by Birla Institute of Applied Sciences, Bhimtal, Uttarakhand.</span>
-          <Link to="/admin/login">Organizer access</Link>
           <span>© 2026 · Built for curious minds.</span>
         </div>
       </footer>

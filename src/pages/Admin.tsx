@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useAuth } from '../lib/auth';
 import {
   ArchiveRestore,
   BarChart3,
@@ -92,8 +93,19 @@ export default function Admin() {
   const [busy, setBusy] = useState(false);
   const [archiveConfirmation, setArchiveConfirmation] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
+  const { signOut } = useAuth();
 
   const section = location.pathname.split('/')[2] ?? '';
+
+  async function handleAdminSignOut() {
+    try {
+      await signOut();
+      navigate('/login?logged_out=1', { replace: true, state: { loggedOut: true } });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Could not sign out.');
+    }
+  }
 
   async function refresh() {
     setLoading(true);
@@ -298,12 +310,20 @@ export default function Admin() {
           Settings
         </Link>
         <Link to="/verify">
-          QR lookup <ArrowUpRight size={13} />
+          Verify team <ArrowUpRight size={13} />
         </Link>
+        <button
+          type="button"
+          className="admin-tab-signout"
+          onClick={() => void handleAdminSignOut()}
+          title="Sign out of mission control"
+        >
+          Sign out
+        </button>
       </nav>
 
-      {error && <Notice error>{error}</Notice>}
-      {message && <Notice>{message}</Notice>}
+      {error && <Notice error popup>{error}</Notice>}
+      {message && <Notice popup>{message}</Notice>}
 
       {loading ? (
         <div className="panel loading-state">Retrieving live event data…</div>

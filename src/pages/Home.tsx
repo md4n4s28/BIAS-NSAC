@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import CountdownSection from '../components/CountdownSection';
 import EventOverview from '../components/EventOverview';
 import FAQList from '../components/FAQList';
@@ -17,6 +17,8 @@ import {
   GraduationCap,
   School,
   ChevronDown,
+  ChevronLeft,
+  ChevronRight,
   Globe2,
   Sparkles,
   Lightbulb,
@@ -64,6 +66,29 @@ export default function Home() {
 
     return () => clearTimeout(timer);
   }, [fullText, isDeleting, reduceMotion, typedText]);
+
+  const filmstripRef = useRef<HTMLDivElement>(null);
+
+  const handleScroll = (direction: 'prev' | 'next') => {
+    const el = filmstripRef.current;
+    if (!el) return;
+    const scrollAmount = Math.max(el.clientWidth * 0.75, 280);
+    const maxScroll = el.scrollWidth - el.clientWidth;
+
+    if (direction === 'prev') {
+      if (el.scrollLeft <= 20) {
+        el.scrollTo({ left: maxScroll, behavior: 'smooth' });
+      } else {
+        el.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+      }
+    } else {
+      if (el.scrollLeft >= maxScroll - 20) {
+        el.scrollTo({ left: 0, behavior: 'smooth' });
+      } else {
+        el.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+      }
+    }
+  };
 
   return (
     <div className={`home-page ${motionEnabled ? 'motion-enabled' : 'motion-paused'}`}>
@@ -427,14 +452,40 @@ export default function Home() {
           </Link>
         </div>
         <div className="gallery-media-grid">
-          <div className="gallery-filmstrip" role="region" aria-label="Event photo filmstrip" tabIndex={0}>
-            <div className="gallery-filmstrip-track">
-              {gallery.map((image) => (
-                <figure className="gallery-film-frame" key={image.src}>
-                  <img src={image.src} alt={image.caption} loading="lazy" />
-                </figure>
-              ))}
+          <div className="gallery-filmstrip-wrapper">
+            <button
+              type="button"
+              className="gallery-nav-btn gallery-nav-prev"
+              onClick={() => handleScroll('prev')}
+              aria-label="Previous photos in gallery reel"
+              title="Previous photos"
+            >
+              <ChevronLeft size={22} strokeWidth={2.2} />
+            </button>
+            <div
+              className="gallery-filmstrip"
+              ref={filmstripRef}
+              role="region"
+              aria-label="Event photo filmstrip"
+              tabIndex={0}
+            >
+              <div className="gallery-filmstrip-track">
+                {gallery.map((image) => (
+                  <figure className="gallery-film-frame" key={image.src}>
+                    <img src={image.src} alt={image.caption} loading="lazy" />
+                  </figure>
+                ))}
+              </div>
             </div>
+            <button
+              type="button"
+              className="gallery-nav-btn gallery-nav-next"
+              onClick={() => handleScroll('next')}
+              aria-label="Next photos in gallery reel"
+              title="Next photos"
+            >
+              <ChevronRight size={22} strokeWidth={2.2} />
+            </button>
           </div>
           <figure className="gallery-promo">
             <video

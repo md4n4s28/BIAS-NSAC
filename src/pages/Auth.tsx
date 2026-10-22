@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { ArrowRight, Eye, EyeOff, Orbit } from 'lucide-react';
+import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
+import { ArrowRight, Clock, Eye, EyeOff, Mail, Orbit } from 'lucide-react';
 import { useAuth } from '../lib/auth';
 import { getSupabase } from '../lib/supabase';
 import { Notice, PageIntro } from '../components/UI';
@@ -20,7 +20,9 @@ export default function Auth({
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const { refresh, signOut } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [searchParams] = useSearchParams();
+  const isLoggedOut = searchParams.get('logged_out') === '1' || Boolean((location.state as { loggedOut?: boolean } | null)?.loggedOut);
 
   const titles = {
     login: 'Welcome back, stargazer.',
@@ -52,7 +54,7 @@ export default function Auth({
           redirectTo: `${window.location.origin}/auth/callback?next=reset-password`,
         });
         if (recoveryError) throw recoveryError;
-        setMessage('If an account exists for this email, a password recovery link has been sent.');
+        setMessage('Password reset email sent! Please check your Inbox and Spam/Junk folder for the recovery link.');
       } else if (mode === 'reset') {
         const { error: updateError } = await supabase.auth.updateUser({ password });
         if (updateError) throw updateError;
@@ -78,7 +80,7 @@ export default function Auth({
           throw new Error('Email confirmation is disabled for this Supabase project. Enable it in Authentication settings before accepting registrations.');
         }
         setVerificationEmail(email);
-        setMessage('Account created. Open the verification link sent to your email, then sign in to register your team.');
+        setMessage(`Verification email sent to ${email}! Please check your Inbox and Spam/Junk folder to verify your account.`);
       } else {
         if (mode === 'admin' && email !== ADMIN_LOGIN_EMAIL) {
           throw new Error('Organizer access is restricted to the designated organizer account.');
@@ -107,10 +109,13 @@ export default function Auth({
         }
 
         await refresh();
+        const from = (location.state as { from?: string } | null)?.from;
         if (isAdmin) {
-          navigate('/admin', { replace: true });
+          const target = from?.startsWith('/admin') ? from : '/admin';
+          navigate(target, { replace: true, state: { loggedIn: true } });
         } else {
-          navigate('/register', { replace: true });
+          const target = from && !from.startsWith('/admin') ? from : '/register';
+          navigate(target, { replace: true, state: { loggedIn: true } });
         }
       }
     } catch (caught: unknown) {
@@ -131,7 +136,7 @@ export default function Auth({
         options: { emailRedirectTo: `${window.location.origin}/auth/callback` },
       });
       if (resendError) throw resendError;
-      setMessage('If this account still needs verification, a fresh link has been sent.');
+      setMessage(`Verification link resent to ${verificationEmail}! Please check your Inbox and Spam/Junk folder.`);
     } catch (caught: unknown) {
       setError(caught instanceof Error ? caught.message : 'The verification email could not be sent.');
     } finally {
@@ -143,7 +148,7 @@ export default function Auth({
     <div className="page auth-page">
       <div className="auth-art">
         <Orbit size={72} strokeWidth={0.8} />
-        <span className="eyebrow">ASTROVERSE / 2026</span>
+        <span className="eyebrow">BIAS-NSAC / 2026</span>
         <h2>
           Every great mission
           <br />
@@ -160,10 +165,22 @@ export default function Auth({
           title={titles[mode]}
         />
         {searchParams.get('verified') === '1' && (
-          <Notice>Your email is verified. Sign in to continue to team registration.</Notice>
+          <Notice popup>Your email is verified. Sign in to continue to team registration.</Notice>
         )}
-        {error && <Notice error>{error}</Notice>}
-        {message && <Notice>{message}</Notice>}
+        {isLoggedOut && (
+          <Notice popup>Account logged out successfully.</Notice>
+        )}
+        {error && <Notice error popup>{error}</Notice>}
+        {message && <Notice popup>{message}</Notice>}
+        {message && ['signup', 'recover'].includes(mode) && (
+          <div className="auth-email-tip">
+            <Mail size={16} aria-hidden="true" />
+            <div>
+              <strong className="auth-card-heading">Check your email box:</strong>
+              <p>We’ve dispatched the link. Be sure to check your <strong>Spam</strong>, <strong>Junk</strong>, or <strong>Promotions</strong> folder if it doesn’t appear in your primary inbox right away.</p>
+            </div>
+          </div>
+        )}
         {mode === 'admin' && (
           <Notice>
             Welcome Back!
@@ -257,30 +274,78 @@ export default function Auth({
           </button>
         </form>
 
-        {['signup', 'login', 'admin', 'recover'].includes(mode) && (
+        {['signup', 'recover'].includes(mode) ? (
+          <div className="auth-rate-limit-card">
+            <Clock size={16} aria-hidden="true" />
+            <div>
+              <strong className="auth-card-heading">Security & Anti-Spam Notice:</strong>
+              <p>
+                Please do not repeatedly press the submit button. Frequent requests will trigger a security rate limit block <span style={{ whiteSpace: 'nowrap' }}>(wait <strong>5 to 10 minutes</strong> before retrying).</span>
+              </p>
+            </div>
+          </div>
+        ) : (
           <p className="auth-rate-limit-note">
-            Avoid repeatedly pressing the button. If you hit a rate limit, wait 2–5 minutes before trying again.
+            Avoid repeatedly pressing sign in. If you hit a rate limit, wait 2–5 minutes before trying again.
           </p>
         )}
 
         {['login', 'admin'].includes(mode) && (
-          <Link className="arrow-link" to="/forgot-password">Forgot your password?</Link>
+          <div className="auth-switch">
+            <span>Forgot your password?</span>
+            <Link className="auth-switch-link" to="/forgot-password">
+              Reset password <ArrowRight size={16} />
+            </Link>
+          </div>
         )}
 
         {mode === 'login' && (
-          <p>Team leader? <Link to="/signup">Create an account</Link></p>
+          <div className="auth-switch">
+            <span>Team leader?</span>
+            <Link className="auth-switch-link" to="/signup">
+              Create an account <ArrowRight size={16} />
+            </Link>
+          </div>
         )}
         {mode === 'signup' && (
           <div className="auth-switch">
             <span>Already have an account?</span>
-            <Link className="auth-switch-link" to="/login">Sign in <ArrowRight size={16} /></Link>
+            <Link className="auth-switch-link" to="/login">
+              Sign in <ArrowRight size={16} />
+            </Link>
           </div>
         )}
         {mode === 'admin' && (
-          <p> <Link to="/signup">Create account</Link></p>
+          <div className="auth-switch">
+            <span>Need an account?</span>
+            <Link className="auth-switch-link" to="/signup">
+              Create account <ArrowRight size={16} />
+            </Link>
+          </div>
         )}
-        {mode === 'reset' && message && (
-          <Link className="button" to="/login">Go to sign in</Link>
+        {mode === 'recover' && (
+          <>
+            <div className="auth-switch">
+              <span>Remember your password?</span>
+              <Link className="auth-switch-link" to="/login">
+                Sign in <ArrowRight size={16} />
+              </Link>
+            </div>
+            <div className="auth-switch">
+              <span>Need a new account?</span>
+              <Link className="auth-switch-link" to="/signup">
+                Create an account <ArrowRight size={16} />
+              </Link>
+            </div>
+          </>
+        )}
+        {mode === 'reset' && (
+          <div className="auth-switch">
+            <span>Back to account?</span>
+            <Link className="auth-switch-link" to="/login">
+              Sign in <ArrowRight size={16} />
+            </Link>
+          </div>
         )}
       </div>
     </div>

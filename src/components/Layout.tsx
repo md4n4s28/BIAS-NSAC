@@ -1,6 +1,23 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { ArrowLeft, ArrowUpRight, Menu, X, MapPin, UserRound, CalendarDays, Globe2 } from 'lucide-react';
+import {
+  ArrowLeft,
+  ArrowUpRight,
+  Menu,
+  X,
+  MapPin,
+  UserRound,
+  CalendarDays,
+  Globe2,
+  ChevronDown,
+  GraduationCap,
+  School,
+  ShieldCheck,
+  Image as ImageIcon,
+  Sparkles,
+  HelpCircle,
+  Phone,
+} from 'lucide-react';
 import type { SectionBackgroundName } from './SectionBackground';
 import { useAuth } from '../lib/auth';
 import { directionsUrl, officialUrl } from '../data/event';
@@ -61,6 +78,7 @@ function RouteContent() {
 
 export default function Layout() {
   const [open, setOpen] = useState(false);
+  const [exploreOpen, setExploreOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [accountError, setAccountError] = useState('');
   const [loginToast, setLoginToast] = useState(false);
@@ -69,11 +87,29 @@ export default function Layout() {
   const navigate = useNavigate();
   const { user, isAdmin, signOut, callbackError } = useAuth();
 
+  const exploreRef = useRef<HTMLDivElement>(null);
+  const profileRef = useRef<HTMLDivElement>(null);
+
+  const exploreRoutes = [
+    '/school',
+    '/college',
+    '/verify',
+    '/gallery',
+    '/quiz',
+    '/faq',
+    '/contact',
+    '/certification',
+    '/why-participate',
+    '/highlights',
+  ];
+  const isExploreActive = exploreRoutes.some((route) => location.pathname.startsWith(route));
+
   async function handleSignOut() {
     setAccountError('');
     try {
       await signOut();
       setProfileOpen(false);
+      setOpen(false);
       navigate('/login?logged_out=1', { replace: true, state: { loggedOut: true } });
     } catch (error) {
       setAccountError(error instanceof Error ? error.message : 'Could not sign out. Please try again.');
@@ -82,11 +118,39 @@ export default function Layout() {
     }
   }
 
+  // Close dropdowns on outside click
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (exploreRef.current && !exploreRef.current.contains(event.target as Node)) {
+        setExploreOpen(false);
+      }
+      if (profileRef.current && !profileRef.current.contains(event.target as Node)) {
+        setProfileOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Reset menus on route navigation
   useEffect(() => {
     setOpen(false);
+    setExploreOpen(false);
     setProfileOpen(false);
     window.scrollTo(0, 0);
   }, [location.pathname]);
+
+  // Lock body scroll on mobile when menu drawer is open
+  useEffect(() => {
+    if (open) {
+      document.body.classList.add('mobile-nav-locked');
+    } else {
+      document.body.classList.remove('mobile-nav-locked');
+    }
+    return () => {
+      document.body.classList.remove('mobile-nav-locked');
+    };
+  }, [open]);
 
   useEffect(() => {
     if ((location.state as { loggedIn?: boolean } | null)?.loggedIn) {
@@ -117,7 +181,7 @@ export default function Layout() {
   return (
     <>
       <a className="skip-link" href="#main">Skip to content</a>
-      <header className="header">
+      <header className={`header ${open ? 'menu-active' : ''}`}>
         <Link className="brand" to="/" aria-label="BIAS-NSAC home">
           <img className="brand-logo" src="/img/event-mark.png" alt="" width="52" height="52" />
           <span>
@@ -125,77 +189,226 @@ export default function Layout() {
             <small>Bhimtal | Uttarakhand</small>
           </span>
         </Link>
-        <button
-          className="menu-toggle"
-          aria-label={open ? 'Close navigation' : 'Open navigation'}
-          aria-expanded={open}
-          onClick={() => setOpen(!open)}
-        >
-          {open ? <X /> : <Menu />}
-        </button>
-        <nav className={open ? 'nav open' : 'nav'} aria-label="Main navigation">
-          <NavLink to="/" end>
-            Home
-          </NavLink>
-          <NavLink to="/about">The event</NavLink>
-          <NavLink to="/problem-statements">Challenges</NavLink>
-          <NavLink to="/how-to-register">How to register</NavLink>
-          <NavLink to="/venue-schedule">Schedule</NavLink>
-          <NavLink to="/gallery">Gallery</NavLink>
-          <NavLink to="/quiz">
-            Space quiz
-            <span className="nav-dot" />
-          </NavLink>
-          <NavLink to="/faq">FAQs</NavLink>
-          <div className="profile-dropdown">
-            <button
-              className="profile-trigger profile-icon-button"
-              aria-expanded={profileOpen}
-              aria-label={user ? 'Open profile menu' : 'Open account menu'}
-              onClick={() => setProfileOpen(!profileOpen)}
-            >
-              <UserRound size={16} />
-              {user && <span className="profile-label">Profile</span>}
-            </button>
-            {profileOpen && (
-              <div className="profile-menu">
-                {user ? (
-                  <>
-                    <span className="profile-menu-account">{user.email}</span>
-                    <NavLink to="/dashboard" onClick={() => setProfileOpen(false)}>
-                      Dashboard
-                    </NavLink>
-                    <NavLink to="/registration-details#team-details" onClick={() => setProfileOpen(false)}>
-                      Team details
-                    </NavLink>
-                    <NavLink to="/registration-details#problem-statement" onClick={() => setProfileOpen(false)}>
-                      Problem statement
-                    </NavLink>
-                    <NavLink to="/id-card#id-cards" onClick={() => setProfileOpen(false)}>
-                      ID cards
-                    </NavLink>
-                    <NavLink to="/forgot-password" onClick={() => setProfileOpen(false)}>
-                      Change password
-                    </NavLink>
-                    {isAdmin && <NavLink to="/admin" onClick={() => setProfileOpen(false)}>Admin mission control</NavLink>}
-                    <button className="text-button sign-out-btn" onClick={() => void handleSignOut()}>
-                      Sign out
-                    </button>
-                  </>
-                ) : (
-                  <>
-                    <NavLink to="/login" onClick={() => setProfileOpen(false)}>
-                      Log in
-                    </NavLink>
-                    <NavLink to="/signup" onClick={() => setProfileOpen(false)}>
-                      Create account
-                    </NavLink>
-                  </>
+
+        {/* Right side navbar & controls */}
+        <div className="header-right">
+          <nav className={open ? 'nav open' : 'nav'} aria-label="Main navigation">
+            <div className="nav-primary-links">
+              <NavLink to="/" end className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
+                Home
+              </NavLink>
+              <NavLink to="/about" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
+                The event
+              </NavLink>
+              <NavLink to="/problem-statements" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
+                Challenges
+              </NavLink>
+              <NavLink to="/venue-schedule" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
+                Schedule
+              </NavLink>
+              <NavLink to="/how-to-register" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
+                How to register
+              </NavLink>
+
+              {/* Desktop Explore Dropdown */}
+              <div className="nav-dropdown" ref={exploreRef}>
+                <button
+                  type="button"
+                  className={`nav-dropdown-trigger ${isExploreActive ? 'active' : ''}`}
+                  onClick={() => setExploreOpen(!exploreOpen)}
+                  aria-expanded={exploreOpen}
+                  aria-label="Explore more pages"
+                >
+                  <span>Explore</span>
+                  <ChevronDown size={14} className={`dropdown-chevron ${exploreOpen ? 'rotate' : ''}`} />
+                </button>
+
+                {exploreOpen && (
+                  <div className="dropdown-menu explore-menu">
+                    <div className="dropdown-menu-header">
+                      <span>EVENT TRACKS & DISCOVERY</span>
+                    </div>
+                    <div className="dropdown-grid">
+                      <Link to="/school" className="dropdown-item" onClick={() => setExploreOpen(false)}>
+                        <div className="dropdown-item-icon"><GraduationCap size={16} /></div>
+                        <div>
+                          <strong>School Category</strong>
+                          <small>Class 8–12 student squads</small>
+                        </div>
+                      </Link>
+                      <Link to="/college" className="dropdown-item" onClick={() => setExploreOpen(false)}>
+                        <div className="dropdown-item-icon"><School size={16} /></div>
+                        <div>
+                          <strong>College Category</strong>
+                          <small>UG, PG & university teams</small>
+                        </div>
+                      </Link>
+                      <Link to="/verify" className="dropdown-item" onClick={() => setExploreOpen(false)}>
+                        <div className="dropdown-item-icon"><ShieldCheck size={16} /></div>
+                        <div>
+                          <strong>Verify Pass</strong>
+                          <small>Instant ID pass & team lookup</small>
+                        </div>
+                      </Link>
+                      <Link to="/gallery" className="dropdown-item" onClick={() => setExploreOpen(false)}>
+                        <div className="dropdown-item-icon"><ImageIcon size={16} /></div>
+                        <div>
+                          <strong>Gallery</strong>
+                          <small>Photos & hackathon highlights</small>
+                        </div>
+                      </Link>
+                      <Link to="/quiz" className="dropdown-item" onClick={() => setExploreOpen(false)}>
+                        <div className="dropdown-item-icon"><Sparkles size={16} /></div>
+                        <div>
+                          <strong>Space Quiz</strong>
+                          <small>Trivia challenge & astronaut rank</small>
+                        </div>
+                      </Link>
+                      <Link to="/faq" className="dropdown-item" onClick={() => setExploreOpen(false)}>
+                        <div className="dropdown-item-icon"><HelpCircle size={16} /></div>
+                        <div>
+                          <strong>FAQs</strong>
+                          <small>Rules, food, hardware & lodging</small>
+                        </div>
+                      </Link>
+                      <Link to="/contact" className="dropdown-item" onClick={() => setExploreOpen(false)}>
+                        <div className="dropdown-item-icon"><Phone size={16} /></div>
+                        <div>
+                          <strong>Contact & Venue</strong>
+                          <small>Campus route, contacts & helpdesk</small>
+                        </div>
+                      </Link>
+                    </div>
+                  </div>
                 )}
               </div>
+            </div>
+
+            {/* Mobile Only: Grouped Explore Links */}
+            <div className="mobile-explore-section">
+              <span className="mobile-nav-heading">EXPLORE & RESOURCES</span>
+              <div className="mobile-explore-grid">
+                <NavLink to="/school" className="mobile-explore-link" onClick={() => setOpen(false)}>
+                  <GraduationCap size={15} /> School Category (Class 8–12)
+                </NavLink>
+                <NavLink to="/college" className="mobile-explore-link" onClick={() => setOpen(false)}>
+                  <School size={15} /> College Category (UG/PG)
+                </NavLink>
+                <NavLink to="/verify" className="mobile-explore-link" onClick={() => setOpen(false)}>
+                  <ShieldCheck size={15} /> Verify Registration Pass
+                </NavLink>
+                <NavLink to="/gallery" className="mobile-explore-link" onClick={() => setOpen(false)}>
+                  <ImageIcon size={15} /> Photo & Video Gallery
+                </NavLink>
+                <NavLink to="/quiz" className="mobile-explore-link" onClick={() => setOpen(false)}>
+                  <Sparkles size={15} /> Space Quiz
+                </NavLink>
+                <NavLink to="/faq" className="mobile-explore-link" onClick={() => setOpen(false)}>
+                  <HelpCircle size={15} /> Frequently Asked Questions
+                </NavLink>
+                <NavLink to="/contact" className="mobile-explore-link" onClick={() => setOpen(false)}>
+                  <Phone size={15} /> Contact & Venue
+                </NavLink>
+              </div>
+            </div>
+
+            {/* Mobile Bottom Action CTA */}
+            <div className="mobile-nav-cta">
+              {user ? (
+                <Link to="/dashboard" className="mobile-cta-btn" onClick={() => setOpen(false)}>
+                  Go to Dashboard
+                </Link>
+              ) : (
+                <Link to="/register" className="mobile-cta-btn" onClick={() => setOpen(false)}>
+                  Register Your Team Now
+                </Link>
+              )}
+            </div>
+          </nav>
+
+          {/* Desktop Right CTA Button & Profile Menu */}
+          <div className="nav-desktop-actions">
+            {user ? (
+              <Link to="/dashboard" className="nav-register-btn">
+                Dashboard
+              </Link>
+            ) : (
+              <Link to="/register" className="nav-register-btn">
+                Register Team
+              </Link>
             )}
+
+            {/* Profile Dropdown */}
+            <div className="profile-dropdown" ref={profileRef}>
+              <button
+                className={`profile-trigger profile-icon-button ${user ? 'is-logged-in' : ''}`}
+                aria-expanded={profileOpen}
+                aria-label={user ? 'Open profile menu' : 'Open account menu'}
+                onClick={() => setProfileOpen(!profileOpen)}
+              >
+                <UserRound size={17} />
+                {user && <span className="profile-dot" />}
+              </button>
+              {profileOpen && (
+                <div className="profile-menu">
+                  {user ? (
+                    <>
+                      <div className="profile-menu-header">
+                        <span className="profile-account-tag">Signed In</span>
+                        <span className="profile-menu-account">{user.email}</span>
+                      </div>
+                      <NavLink to="/dashboard" onClick={() => setProfileOpen(false)}>
+                        Dashboard
+                      </NavLink>
+                      <NavLink to="/registration-details#team-details" onClick={() => setProfileOpen(false)}>
+                        Team details
+                      </NavLink>
+                      <NavLink to="/registration-details#problem-statement" onClick={() => setProfileOpen(false)}>
+                        Problem statement
+                      </NavLink>
+                      <NavLink to="/id-card#id-cards" onClick={() => setProfileOpen(false)}>
+                        ID cards
+                      </NavLink>
+                      <NavLink to="/forgot-password" onClick={() => setProfileOpen(false)}>
+                        Change password
+                      </NavLink>
+                      {isAdmin && (
+                        <NavLink to="/admin" onClick={() => setProfileOpen(false)} className="admin-menu-link">
+                          Admin mission control
+                        </NavLink>
+                      )}
+                      <button className="text-button sign-out-btn" onClick={() => void handleSignOut()}>
+                        Sign out
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <div className="profile-menu-header">
+                        <span className="profile-account-tag">Mission Portal</span>
+                      </div>
+                      <NavLink to="/login" onClick={() => setProfileOpen(false)}>
+                        Log in
+                      </NavLink>
+                      <NavLink to="/signup" onClick={() => setProfileOpen(false)}>
+                        Create account
+                      </NavLink>
+                    </>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
-        </nav>
+
+          {/* Mobile Menu Toggle Button */}
+          <button
+            className="menu-toggle"
+            aria-label={open ? 'Close navigation' : 'Open navigation'}
+            aria-expanded={open}
+            onClick={() => setOpen(!open)}
+          >
+            {open ? <X size={24} /> : <Menu size={24} />}
+          </button>
+        </div>
       </header>
       <main id="main">
         {loginToast && (

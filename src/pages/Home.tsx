@@ -25,6 +25,10 @@ import {
   Trophy,
   Network,
   Radio,
+  ArrowRight,
+  Clock,
+  Award,
+  CheckCircle2,
 } from 'lucide-react';
 import { ButtonLink, SectionHeading } from '../components/UI';
 import { directionsUrl, gallery, officialUrl, schedule, venueMapEmbedUrl } from '../data/event';
@@ -237,11 +241,7 @@ export default function Home() {
             );
           })}
         </div>
-        <p className="flight-plan-note">
-          <CalendarDays size={16} aria-hidden="true" />
-          Sequence shown for planning. Session details and times remain subject to organizer
-          confirmation.
-        </p>
+
       </section>
 
       {/* Mission Section */}
@@ -334,45 +334,102 @@ export default function Home() {
       {/* Quiz Banner */}
       <section className="quiz-banner section">
         <div className="quiz-invitation">
-          <span className="eyebrow">
-            <span />A LITTLE CURIOSITY GOES A LONG WAY
-          </span>
+          <div className="quiz-live-badge">
+            <span className="quiz-pulse-dot" />
+            <span>INTERACTIVE CHALLENGE · {questions.length} MISSIONS</span>
+          </div>
+
           <h2>
             A curious mind.
             <br />
-            <em>A cosmic challenge.</em>
+            <span className="quiz-gold-gradient">A cosmic challenge.</span>
           </h2>
+          
           <p>
-            From planetary rings to rocket science, discover how well you know the universe. Just
-            you and your curiosity.
+            From planetary rings and black hole physics to rocket flight staging and mission milestones, discover how well you know the universe. Just you and your cosmic curiosity.
           </p>
-          <ButtonLink to="/quiz">Take the space quiz</ButtonLink>
-          <span className="quiz-access-note">No registration needed. Explore at your own pace.</span>
-        </div>
-        <div className="quiz-brief">
-          <div className="quiz-brief-heading">
-            <span className="micro-label">YOUR MISSION BRIEF</span>
-            <Rocket size={25} strokeWidth={1.5} aria-hidden="true" />
+
+          <div className="quiz-chips-row">
+            <span className="quiz-chip">🪐 5 Question Formats</span>
+            <span className="quiz-chip">⏱️ Live Flight Timer</span>
+            <span className="quiz-chip">🎖️ Official Ranks</span>
           </div>
-          <div className="quiz-question-count">
-            <strong>{questions.length}</strong>
-            <span>
-              questions.
-              <br />
-              One universe to explore.
+
+          <div className="quiz-action-wrapper">
+            <ButtonLink to="/quiz" className="quiz-launch-btn">
+              <span>INITIATE MISSION</span>
+            </ButtonLink>
+            <span className="quiz-access-note">
+              <CheckCircle2 size={13} />
+              <span>No login required · 5–7 min mission time · Instant debrief</span>
             </span>
           </div>
-          <div className="quiz-brief-row">
-            <Atom size={20} aria-hidden="true" />
-            <span>Space, science & discovery</span>
+        </div>
+
+        <div className="quiz-brief">
+          <div className="quiz-brief-top-bar">
+            <div className="quiz-telemetry-status">
+              <span className="quiz-telemetry-dot" />
+              <span>TELEMETRY: ACTIVE</span>
+            </div>
+            <span className="quiz-brief-tag">NASA FLIGHT TEST</span>
           </div>
-          <div className="quiz-brief-row">
-            <Lightbulb size={20} aria-hidden="true" />
-            <span>Learn something with every answer</span>
+
+          <div className="quiz-brief-hero">
+            <div className="quiz-brief-number-box">
+              <strong className="quiz-big-num">{questions.length}</strong>
+              <div className="quiz-num-caption">
+                <span className="quiz-num-title">MISSIONS</span>
+                <span className="quiz-num-sub">Multi-Format Challenges</span>
+              </div>
+            </div>
+            <div className="quiz-brief-icon-orbital">
+              <Rocket size={24} strokeWidth={1.75} aria-hidden="true" />
+            </div>
           </div>
-          <div className="quiz-brief-row">
-            <Sparkles size={20} aria-hidden="true" />
-            <span>Instant results, endless curiosity</span>
+
+          <div className="quiz-format-pills">
+            <span>MCQ</span>
+            <span>Fact vs Myth</span>
+            <span>Sequences</span>
+            <span>Matching</span>
+          </div>
+
+          <div className="quiz-brief-features">
+            <div className="quiz-brief-row">
+              <div className="quiz-row-icon-wrap">
+                <Atom size={16} aria-hidden="true" />
+              </div>
+              <div className="quiz-row-content">
+                <strong>Astrophysics & Exploration</strong>
+                <small>James Webb, black holes, ocean worlds & Saturn rings</small>
+              </div>
+            </div>
+
+            <div className="quiz-brief-row">
+              <div className="quiz-row-icon-wrap">
+                <Clock size={16} aria-hidden="true" />
+              </div>
+              <div className="quiz-row-content">
+                <strong>Precision Mission Clock</strong>
+                <small>Real-time telemetry stopwatch tracking your flight pace</small>
+              </div>
+            </div>
+
+            <div className="quiz-brief-row">
+              <div className="quiz-row-icon-wrap">
+                <Award size={16} aria-hidden="true" />
+              </div>
+              <div className="quiz-row-content">
+                <strong>Astronautical Rank & Debrief</strong>
+                <small>Earn rank from Cadet to Flight Commander with scientific insights</small>
+              </div>
+            </div>
+          </div>
+
+          <div className="quiz-brief-footer">
+            <span>FLIGHT SECTOR: DEEP SPACE</span>
+            <span>TIERS: CADET &rarr; COMMANDER</span>
           </div>
         </div>
       </section>

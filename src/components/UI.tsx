@@ -3,8 +3,8 @@ import { createPortal } from 'react-dom';
 import { AlertCircle, ArrowUpRight, CheckCircle2, ChevronRight, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
-export function ButtonLink({ to, children, secondary = false, external = false }: { to: string; children: ReactNode; secondary?: boolean; external?: boolean }) {
-  const props = { className: `button ${secondary ? 'button-secondary' : ''}` };
+export function ButtonLink({ to, children, secondary = false, external = false, className = '' }: { to: string; children: ReactNode; secondary?: boolean; external?: boolean; className?: string }) {
+  const props = { className: `button ${secondary ? 'button-secondary' : ''} ${className}`.trim() };
   return external ? <a href={to} target="_blank" rel="noreferrer" {...props}>{children}<ArrowUpRight size={17} /></a> : <Link to={to} {...props}>{children}<ChevronRight size={17} /></Link>;
 }
 

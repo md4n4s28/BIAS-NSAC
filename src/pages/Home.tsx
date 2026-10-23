@@ -33,6 +33,7 @@ import {
 import { ButtonLink, SectionHeading } from '../components/UI';
 import { directionsUrl, gallery, officialUrl, schedule, venueMapEmbedUrl } from '../data/event';
 import { questions } from '../data/quiz';
+import { problemStatements } from '../data/problem-statements';
 
 export default function Home() {
   const reduceMotion = useReducedMotion();
@@ -242,6 +243,88 @@ export default function Home() {
           })}
         </div>
 
+      </section>
+
+      {/* Problem Statements Section */}
+      <section id="problem-statements" className="section home-ps-section">
+        <div className="home-ps-header">
+          <div className="home-ps-heading-block">
+            <SectionHeading
+              eyebrow="OFFICIAL 2026 CHALLENGES"
+              title={'14 Problem Statements.\nChoose Your Mission.'}
+            />
+            <p className="home-ps-lead">
+              Tackle real-world challenges defined by NASA scientists and engineers.
+              Explore all 14 problem statements, assemble your crew, and build either a functional hardware prototype or software application at BIAS Bhimtal.
+            </p>
+          </div>
+          <div className="home-ps-header-cta">
+            <Link to="/problem-statements" className="button button-primary home-ps-view-all-btn">
+              <span>View Full Problem Statements</span>
+              <ArrowRight size={18} />
+            </Link>
+          </div>
+        </div>
+
+        <div className="home-ps-grid">
+          {problemStatements.map((ps) => (
+            <Link
+              to={`/problem-statements#ps-${ps.id}`}
+              key={ps.id}
+              className="home-ps-tile"
+              aria-label={`View challenge ${ps.id}: ${ps.title}`}
+            >
+              <div className="home-ps-tile-top">
+                <span className="home-ps-tile-number">PS {ps.id}</span>
+                <div className="home-ps-tile-diffs">
+                  {ps.difficulties.map((diff) => (
+                    <span
+                      key={diff}
+                      className={`home-ps-diff-pill ${
+                        diff.toLowerCase().includes('beginner')
+                          ? 'diff-beginner'
+                          : diff.toLowerCase().includes('advanced')
+                          ? 'diff-advanced'
+                          : 'diff-intermediate'
+                      }`}
+                    >
+                      {diff}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              <h3 className="home-ps-tile-title">{ps.title}</h3>
+
+              <div className="home-ps-tile-subjects">
+                {ps.subjects.slice(0, 3).map((subj) => (
+                  <span key={subj} className="home-ps-subj-badge">
+                    #{subj}
+                  </span>
+                ))}
+                {ps.subjects.length > 3 && (
+                  <span className="home-ps-subj-more">+{ps.subjects.length - 3}</span>
+                )}
+              </div>
+
+              <div className="home-ps-tile-footer">
+                <span className="home-ps-tile-link-text">Read challenge details</span>
+                <ArrowUpRight size={16} className="home-ps-tile-arrow" />
+              </div>
+            </Link>
+          ))}
+        </div>
+
+        <div className="home-ps-bottom-bar">
+          <div className="home-ps-note">
+            <Sparkles size={18} className="text-accent" />
+            <span>Each team chooses 1 of the 14 challenges. Solutions built on-site can qualify for international Global Nominee judging.</span>
+          </div>
+          <Link to="/problem-statements" className="button button-secondary">
+            <span>Explore All 14 Problem Statements with Full Details</span>
+            <ArrowRight size={16} />
+          </Link>
+        </div>
       </section>
 
       {/* Mission Section */}

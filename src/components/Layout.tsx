@@ -17,6 +17,8 @@ const pageBackgrounds: Record<string, SectionBackgroundName> = {
   '/certification': 'mission',
   '/contact': 'experience',
   '/why-participate': 'categories',
+  '/problem-statements': 'mission',
+  '/challenges': 'mission',
   '/school': 'mission',
   '/college': 'experience',
   '/login': 'mission',
@@ -136,6 +138,7 @@ export default function Layout() {
             Home
           </NavLink>
           <NavLink to="/about">The event</NavLink>
+          <NavLink to="/problem-statements">Challenges</NavLink>
           <NavLink to="/venue-schedule">Schedule</NavLink>
           <NavLink to="/gallery">Gallery</NavLink>
           <NavLink to="/quiz">

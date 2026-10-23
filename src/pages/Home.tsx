@@ -44,6 +44,14 @@ export default function Home() {
   const fullText = 'CHALLENGE 2026';
   const [typedText, setTypedText] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
+  const psGridRef = useRef<HTMLDivElement>(null);
+
+  const scrollPsGrid = (direction: 'left' | 'right') => {
+    if (psGridRef.current) {
+      const scrollAmount = direction === 'left' ? -300 : 300;
+      psGridRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+    }
+  };
 
   useEffect(() => {
     const mobileQuery = window.matchMedia('(max-width: 800px)');
@@ -249,10 +257,13 @@ export default function Home() {
       <section id="problem-statements" className="section home-ps-section">
         <div className="home-ps-header">
           <div className="home-ps-heading-block">
-            <SectionHeading
-              eyebrow="OFFICIAL 2026 CHALLENGES"
-              title={'14 Problem Statements.\nChoose Your Mission.'}
-            />
+            <div className="section-heading">
+              <span className="eyebrow"><span />OFFICIAL 2026 CHALLENGES</span>
+              <h2 className="home-ps-title-heading">
+                <span className="home-ps-title-line">14 Problem Statements.</span>
+                <span className="home-ps-title-line">Choose Your Mission.</span>
+              </h2>
+            </div>
             <p className="home-ps-lead">
               Tackle real-world challenges defined by NASA scientists and engineers.
               Explore all 14 problem statements, assemble your crew, and build either a functional hardware prototype or software application at BIAS Bhimtal.
@@ -266,53 +277,77 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="home-ps-grid">
-          {problemStatements.map((ps) => (
-            <Link
-              to={`/problem-statements#ps-${ps.id}`}
-              key={ps.id}
-              className="home-ps-tile"
-              aria-label={`View challenge ${ps.id}: ${ps.title}`}
+        {/* Mobile Quick Rail Controls */}
+        <div className="home-ps-rail-controls">
+          <span className="home-ps-rail-hint">
+            <Sparkles size={14} className="text-accent" />
+            <span>Swipe or click arrows to browse all 14 challenges (Swipe availabe in mobile view)</span>
+          </span>
+          <div className="home-ps-arrow-buttons">
+            <button
+              type="button"
+              className="home-ps-arrow-nav-btn"
+              onClick={() => scrollPsGrid('left')}
+              aria-label="Scroll left to previous challenges"
             >
-              <div className="home-ps-tile-top">
-                <span className="home-ps-tile-number">PS {ps.id}</span>
-                <div className="home-ps-tile-diffs">
-                  {ps.difficulties.map((diff) => (
-                    <span
-                      key={diff}
-                      className={`home-ps-diff-pill ${
-                        diff.toLowerCase().includes('beginner')
-                          ? 'diff-beginner'
-                          : diff.toLowerCase().includes('advanced')
-                          ? 'diff-advanced'
-                          : 'diff-intermediate'
-                      }`}
-                    >
-                      {diff}
+              <ChevronLeft size={18} />
+            </button>
+            <button
+              type="button"
+              className="home-ps-arrow-nav-btn"
+              onClick={() => scrollPsGrid('right')}
+              aria-label="Scroll right to next challenges"
+            >
+              <ChevronRight size={18} />
+            </button>
+          </div>
+        </div>
+
+        <div className="home-ps-grid" ref={psGridRef}>
+          {problemStatements.map((ps) => {
+            const primaryDiff = ps.difficulties[0] || 'Intermediate';
+            const diffClass = primaryDiff.toLowerCase().includes('beginner')
+              ? 'diff-beginner'
+              : primaryDiff.toLowerCase().includes('advanced')
+                ? 'diff-advanced'
+                : 'diff-intermediate';
+
+            return (
+              <Link
+                to={`/problem-statements#ps-${ps.id}`}
+                key={ps.id}
+                className="home-ps-tile"
+                aria-label={`View challenge ${ps.id}: ${ps.title}`}
+              >
+                <div className="home-ps-tile-top">
+                  <span className="home-ps-tile-number">PS {ps.id}</span>
+                  <span className={`home-ps-diff-pill ${diffClass}`}>
+                    {primaryDiff}
+                  </span>
+                </div>
+
+                <h3 className="home-ps-tile-title" title={ps.title}>
+                  {ps.title}
+                </h3>
+
+                <div className="home-ps-tile-subjects">
+                  {ps.subjects.slice(0, 2).map((subj) => (
+                    <span key={subj} className="home-ps-subj-badge">
+                      #{subj}
                     </span>
                   ))}
+                  {ps.subjects.length > 2 && (
+                    <span className="home-ps-subj-more">+{ps.subjects.length - 2}</span>
+                  )}
                 </div>
-              </div>
 
-              <h3 className="home-ps-tile-title">{ps.title}</h3>
-
-              <div className="home-ps-tile-subjects">
-                {ps.subjects.slice(0, 3).map((subj) => (
-                  <span key={subj} className="home-ps-subj-badge">
-                    #{subj}
-                  </span>
-                ))}
-                {ps.subjects.length > 3 && (
-                  <span className="home-ps-subj-more">+{ps.subjects.length - 3}</span>
-                )}
-              </div>
-
-              <div className="home-ps-tile-footer">
-                <span className="home-ps-tile-link-text">Read challenge details</span>
-                <ArrowUpRight size={16} className="home-ps-tile-arrow" />
-              </div>
-            </Link>
-          ))}
+                <div className="home-ps-tile-footer">
+                  <span className="home-ps-tile-link-text">Read brief</span>
+                  <ArrowUpRight size={14} className="home-ps-tile-arrow" />
+                </div>
+              </Link>
+            );
+          })}
         </div>
 
         <div className="home-ps-bottom-bar">
@@ -320,34 +355,126 @@ export default function Home() {
             <Sparkles size={18} className="text-accent" />
             <span>Each team chooses 1 of the 14 challenges. Solutions built on-site can qualify for international Global Nominee judging.</span>
           </div>
-          <Link to="/problem-statements" className="button button-secondary">
-            <span>Explore All 14 Problem Statements with Full Details</span>
-            <ArrowRight size={16} />
-          </Link>
         </div>
       </section>
 
       {/* Mission Section */}
-      <section id="mission" className="section mission-section immersive-section">
-        <div>
-          <SectionHeading
-            eyebrow="OUR SHARED MISSION"
-            title={'A global challenge.\nA local community.'}
-          />
-          <EventOverview />
+      <section id="mission" className="section mission-section">
+        <div className="mission-content-left">
+          <div className="section-heading">
+            <span className="eyebrow"><span />OUR SHARED MISSION</span>
+            <h2 className="mission-main-heading">
+              <span>A global challenge.</span>
+              <span>A local community.</span>
+            </h2>
+          </div>
+
+          <p className="mission-lead-text">
+            The NASA International Space Apps Challenge is the world&apos;s premier hackathon, uniting coders, scientists, designers, and space enthusiasts to solve real-world challenges using open NASA space assets.
+          </p>
+
+          <div className="mission-host-callout">
+            <div className="mission-host-tag">
+              <Sparkles size={14} className="text-accent" />
+              <span>ASTROVERSE // LOCAL EDITION</span>
+            </div>
+            <p className="mission-host-desc">
+              Hosted on the scenic mountain campus of <strong>Birla Institute of Applied Sciences (BIAS)</strong> in Bhimtal, Uttarakhand from <strong>14–16 November 2026</strong>.
+            </p>
+          </div>
+
+          <div className="mission-telemetry-chips">
+            <div className="mission-chip">
+              <span className="mission-chip-val">36 HRS</span>
+              <span className="mission-chip-lbl">Sprint Hackathon</span>
+            </div>
+            <div className="mission-chip">
+              <span className="mission-chip-val">OPEN DATA</span>
+              <span className="mission-chip-lbl">NASA Space Assets</span>
+            </div>
+            <div className="mission-chip">
+              <span className="mission-chip-val">HYBRID</span>
+              <span className="mission-chip-lbl">On-Campus & Online</span>
+            </div>
+          </div>
+
+          <div className="mission-actions-row">
+            <a
+              href={officialUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="button button-primary mission-official-btn"
+            >
+              <span>Official NASA Space Apps Hub</span>
+              <ArrowUpRight size={17} />
+            </a>
+            <Link to="/venue" className="button button-secondary mission-venue-btn">
+              <MapPin size={16} />
+              <span>Campus & Travel Guide</span>
+            </Link>
+          </div>
         </div>
-        <div className="event-coordinate">
-          <span className="micro-label">NASA INTERNATIONAL SPACE APPS CHALLENGE 2026</span>
-          <strong>BHIMTAL</strong>
-          <span>14–16 NOVEMBER 2026</span>
-          <span>Birla Institute of Applied Sciences</span>
-          <iframe
-            className="event-coordinate-map"
-            title="Mini map locating Birla Institute of Applied Sciences, Bhimtal"
-            src={venueMapEmbedUrl}
-            loading="lazy"
-            referrerPolicy="no-referrer-when-downgrade"
-          />
+
+        {/* Observatory Map Console Panel */}
+        <div className="observatory-console-panel">
+          <div className="observatory-card-header">
+            <div className="observatory-status-pill">
+              <span className="radar-ping-dot" />
+              <span>LIVE GROUND STATION</span>
+            </div>
+            <span className="observatory-telemetry-tag">
+              29.3567° N, 79.5541° E
+            </span>
+          </div>
+
+          <div className="observatory-identity">
+            <span className="observatory-subhead">NASA SPACE APPS CHALLENGE 2026 VENUE</span>
+            <h3 className="observatory-city-title">BHIMTAL, UTTARAKHAND</h3>
+            <span className="observatory-institution">Birla Institute of Applied Sciences</span>
+            <span className="observatory-date-badge">
+              <CalendarDays size={14} /> 14–16 NOVEMBER 2026
+            </span>
+          </div>
+
+          {/* High-Tech Map Frame */}
+          <div className="observatory-map-frame">
+            <iframe
+              className="observatory-map-embed"
+              title="Map locating Birla Institute of Applied Sciences, Bhimtal"
+              src={venueMapEmbedUrl}
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+            />
+            <div className="observatory-map-overlay">
+              <a
+                href={directionsUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="observatory-open-maps-btn"
+                aria-label="Open location in Google Maps"
+              >
+                <MapPin size={14} />
+                <span>Get Directions in Maps</span>
+                <ArrowUpRight size={14} />
+              </a>
+            </div>
+          </div>
+
+          {/* Observatory Venue Specs - Using span instead of strong */}
+          <div className="observatory-specs-grid">
+            <div className="observatory-spec-item">
+              <span className="spec-label">ALTITUDE</span>
+              <span className="spec-value">1,370 m (4,495 ft)</span>
+            </div>
+            <div className="observatory-spec-item">
+              <span className="spec-label">CAMPUS FACILITIES</span>
+              <span className="spec-value">Labs & Fast WiFi</span>
+            </div>
+            <div className="observatory-spec-item">
+              <span className="spec-label">ACCOMMODATION</span>
+              <span className="spec-value">For Shortlisted Teams</span>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -359,55 +486,83 @@ export default function Home() {
             title="Three days. A whole new perspective."
           />
           <Link className="perspective-link" to="/why-participate">
-            Why participate? <ArrowUpRight size={18} />
+            <span>Why participate?</span>
+            <ArrowUpRight size={18} />
           </Link>
         </div>
+
+        {/* Mobile Swipe Hint */}
+        <div className="perspective-mobile-hint">
+          <Sparkles size={14} className="text-accent" />
+          <span>Swipe to explore all 4 pillars</span>
+        </div>
+
         <div className="perspective-grid">
           {[
             {
+              pillar: '01',
+              phase: 'ACCREDITATION',
+              accent: 'gold',
               icon: Trophy,
-              number: '01 / RECOGNITION',
-              label: 'Participation & recognition',
-              title: 'CERTIFICATION',
-              text: 'See certificate eligibility and complete both event registrations.',
+              label: 'Official Recognition',
+              title: 'NASA Certification',
+              text: 'Every registered, active participant receives an official NASA Space Apps Certificate of Participation. Top winning teams are awarded physical mementos and certificates.',
+              linkText: 'Certificate details',
               to: '/certification',
             },
             {
+              pillar: '02',
+              phase: 'PERKS & SWAG',
+              accent: 'cyan',
               icon: Sparkles,
-              number: '02 / PERKS',
-              label: 'Event perks & keepsakes',
-              title: 'GOODIES',
-              text: 'Any event keepsakes or participant perks are subject to organizer confirmation.',
+              label: 'Participant Perks',
+              title: 'Exclusive Keepsakes',
+              text: 'Receive specialized hackathon badges, digital badges, curated event perks, and commemorative memorabilia designed for the 2026 Bhimtal cohort.',
+              linkText: 'Event highlights',
+              to: '/highlights',
             },
             {
+              pillar: '03',
+              phase: 'CHALLENGES',
+              accent: 'purple',
               icon: Atom,
-              number: '03 / EXPLORE',
-              label: 'Space science & exploration',
-              title: 'FOLLOW YOUR CURIOSITY',
-              text: 'Explore new ideas, connect the dots, and turn your curiosity about space into something real.',
+              label: 'Space Science',
+              title: 'Follow Your Curiosity',
+              text: 'Choose from 14 real-world challenges set by NASA scientists. Access open satellite telemetry, planetary imagery, and APIs to develop hardware or software solutions.',
+              linkText: 'Browse 14 Challenges',
+              to: '/problem-statements',
             },
             {
-              icon: Network,
-              number: '04 / CONNECT',
-              label: 'Teamwork & networking',
-              title: 'CONNECT & COMMUNICATE',
-              text: 'Share ideas, communicate clearly, meet new people, and build connections through the event.',
+              pillar: '04',
+              phase: 'COMMUNITY',
+              accent: 'emerald',
+              icon: Users,
+              label: 'Networking & Mentors',
+              title: 'Connect & Collaborate',
+              text: 'Team up with talented peers, receive one-on-one guidance from domain mentors, and present your prototype to an esteemed academic and industry jury panel.',
+              linkText: 'Participant guide',
+              to: '/why-participate',
             },
           ].map((item) => (
-            <article className="perspective-card" key={item.number}>
+            <article className={`perspective-card perspective-pillar-${item.accent}`} key={item.pillar}>
               <div className="perspective-card-top">
-                <item.icon size={27} aria-hidden="true" />
-                <span>{item.number}</span>
+                <div className="perspective-icon-box">
+                  <item.icon size={22} aria-hidden="true" />
+                </div>
+                <span className="perspective-pillar-tag">PILLAR {item.pillar} // {item.phase}</span>
               </div>
-              <div>
+
+              <div className="perspective-card-body">
                 <span className="perspective-label">{item.label}</span>
-                <h3>{item.title}</h3>
-                <p>{item.text}</p>
-                {item.to && (
-                  <Link className="arrow-link certificate-card-link" to={item.to}>
-                    Certificate details <ArrowUpRight size={17} />
-                  </Link>
-                )}
+                <h3 className="perspective-card-title">{item.title}</h3>
+                <p className="perspective-card-text">{item.text}</p>
+              </div>
+
+              <div className="perspective-card-footer">
+                <Link className="perspective-action-link" to={item.to}>
+                  <span>{item.linkText}</span>
+                  <ArrowUpRight size={16} />
+                </Link>
               </div>
             </article>
           ))}
@@ -427,7 +582,7 @@ export default function Home() {
             <br />
             <span className="quiz-gold-gradient">A cosmic challenge.</span>
           </h2>
-          
+
           <p>
             From planetary rings and black hole physics to rocket flight staging and mission milestones, discover how well you know the universe. Just you and your cosmic curiosity.
           </p>

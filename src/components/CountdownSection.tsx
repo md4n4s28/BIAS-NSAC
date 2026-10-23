@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Rocket, MapPin, Clock, CalendarDays } from 'lucide-react';
 
 interface TimeLeft {
   days: number;
@@ -57,12 +58,15 @@ export default function CountdownSection() {
         <div className="countdown">
           <div className="countdown-heading">
             <div className={`countdown-label countdown-label-${eventPhase}`}>
-              <span className="live-dot" aria-hidden="true" />
-              {eventPhase === 'upcoming'
-                ? 'COUNTDOWN TO LIFTOFF'
-                : eventPhase === 'live'
-                  ? 'LIFTOFF IN PROGRESS'
-                  : 'MISSION COMPLETE'}
+              <span className="countdown-pulse-dot" aria-hidden="true" />
+              <Rocket size={13} className="countdown-label-icon" />
+              <span>
+                {eventPhase === 'upcoming'
+                  ? 'COUNTDOWN TO LIFTOFF'
+                  : eventPhase === 'live'
+                    ? 'LIFTOFF IN PROGRESS'
+                    : 'MISSION COMPLETE'}
+              </span>
             </div>
             <p className="countdown-tagline">
               {eventPhase === 'upcoming'
@@ -88,12 +92,21 @@ export default function CountdownSection() {
             </div>
           )}
         </div>
-        <p className="countdown-date">
-          <span>14–16 November 2026</span>
-          <span aria-hidden="true">·</span>
-          <span>Bhimtal, Uttarakhand</span>
-          <span className="countdown-timezone">Indian Standard Time</span>
-        </p>
+        <div className="countdown-date">
+          <span className="countdown-date-item">
+            <CalendarDays size={14} className="countdown-date-icon" />
+            <span>14–16 November 2026</span>
+          </span>
+          <span className="countdown-date-sep" aria-hidden="true">·</span>
+          <span className="countdown-date-item">
+            <MapPin size={14} className="countdown-date-icon" />
+            <span>Bhimtal, Uttarakhand</span>
+          </span>
+          <span className="countdown-timezone">
+            <Clock size={12} />
+            <span>Indian Standard Time</span>
+          </span>
+        </div>
       </div>
     </section>
   );

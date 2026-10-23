@@ -139,6 +139,7 @@ export default function Layout() {
           </NavLink>
           <NavLink to="/about">The event</NavLink>
           <NavLink to="/problem-statements">Challenges</NavLink>
+          <NavLink to="/how-to-register">How to register</NavLink>
           <NavLink to="/venue-schedule">Schedule</NavLink>
           <NavLink to="/gallery">Gallery</NavLink>
           <NavLink to="/quiz">
@@ -241,6 +242,7 @@ export default function Layout() {
 
           <nav className="footer-link-group" aria-label="Participate and get help">
             <span className="footer-column-label">TAKE PART</span>
+            <Link to="/how-to-register">How to register</Link>
             <Link to="/school">School category</Link>
             <Link to="/college">College category</Link>
             <Link to="/register">Register a team</Link>

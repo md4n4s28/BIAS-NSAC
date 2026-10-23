@@ -29,11 +29,69 @@ import {
   Clock,
   Award,
   CheckCircle2,
+  ExternalLink,
+  Eye,
+  Camera,
+  Maximize2,
 } from 'lucide-react';
 import { ButtonLink, SectionHeading } from '../components/UI';
 import { directionsUrl, gallery, officialUrl, schedule, venueMapEmbedUrl } from '../data/event';
 import { questions } from '../data/quiz';
 import { problemStatements } from '../data/problem-statements';
+
+const homeNasaPreviews = [
+  {
+    step: 'Step 01',
+    title: 'Official NASA Space Apps Portal',
+    desc: 'Access official spaceappschallenge.org and complete participant registration',
+    img: '/registration/nasa/1. NASA-Portal.png',
+  },
+  {
+    step: 'Step 04',
+    title: 'Haldwani Local Event Page',
+    desc: 'Sign up for the local event hosted by Birla Institute of Applied Sciences',
+    img: '/registration/nasa/5. Sign Up For This Local Event.png',
+  },
+  {
+    step: 'Step 09',
+    title: 'Create Team (Team Leader Only)',
+    desc: 'Leader creates team name, problem challenge, and invites members',
+    img: '/registration/nasa/9. Create a Team.png',
+  },
+  {
+    step: 'Step 10',
+    title: 'Join Team (Team Members)',
+    desc: 'Members search for team and accept join invitations',
+    img: '/registration/nasa/10. Join a Team (For Team Members).png',
+  },
+];
+
+const homeBiasPreviews = [
+  {
+    step: 'Step 01',
+    title: 'Register Team on BIAS-NSAC',
+    desc: 'Team Leader creates account and initiates institutional registration',
+    img: '/registration/bias/1. Click Register Team or Profile Login.png',
+  },
+  {
+    step: 'Step 03',
+    title: 'Gmail Account Verification',
+    desc: 'Verify designated email address from BIAS-NSAC mailbox to activate login',
+    img: '/registration/bias/3. Check Gmail for Account Verification.png',
+  },
+  {
+    step: 'Step 05',
+    title: 'Complete Team Registration Form',
+    desc: 'Enter exact same member details & select participation mode',
+    img: '/registration/bias/5. Fill Complete Team Form.png',
+  },
+  {
+    step: 'Step 07',
+    title: 'Download Digital ID Cards',
+    desc: 'Instant generated delegate badges for all team members',
+    img: '/registration/bias/7. Download Digital ID.png',
+  },
+];
 
 export default function Home() {
   const reduceMotion = useReducedMotion();
@@ -41,6 +99,8 @@ export default function Home() {
   const [mobileViewport, setMobileViewport] = useState(
     () => typeof window !== 'undefined' && window.matchMedia('(max-width: 800px)').matches
   );
+  const [homeRegTab, setHomeRegTab] = useState<'nasa' | 'bias'>('nasa');
+  const [homeRegPreviewIdx, setHomeRegPreviewIdx] = useState(0);
   const fullText = 'CHALLENGE 2026';
   const [typedText, setTypedText] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
@@ -102,6 +162,9 @@ export default function Home() {
       }
     }
   };
+
+  const activeHomeList = homeRegTab === 'nasa' ? homeNasaPreviews : homeBiasPreviews;
+  const currentHomePreview = activeHomeList[homeRegPreviewIdx] || activeHomeList[0];
 
   return (
     <div className={`home-page ${motionEnabled ? 'motion-enabled' : 'motion-paused'}`}>
@@ -207,6 +270,173 @@ export default function Home() {
 
       {/* Countdown Section */}
       <CountdownSection />
+
+      {/* How to Register Section */}
+      <section id="how-to-register" className="section home-register-guide-section">
+        <div className="home-reg-guide-container">
+          <div className="home-reg-guide-header">
+            <div className="section-heading">
+              <span className="eyebrow"><span />OFFICIAL ONBOARDING PROTOCOL</span>
+              <h2 className="home-reg-guide-title">
+                <span>How to Register.</span>
+                <span className="text-accent">2 Mandatory Phases.</span>
+              </h2>
+            </div>
+            <p className="home-reg-guide-lead">
+              To participate at BIAS Bhimtal and qualify for NASA global nominee awards, every team must complete registration on both the <strong>official NASA Space Apps portal</strong> and the <strong>BIAS-NSAC portal</strong> with matching roster details.
+            </p>
+          </div>
+
+          <div className="home-reg-guide-grid">
+            {/* Left Column: 2 Phases Summary */}
+            <div className="home-reg-steps-col">
+              {/* Phase 1 Tile */}
+              <div className="home-reg-phase-card">
+                <div className="home-reg-phase-top">
+                  <span className="home-reg-phase-pill">PHASE 01 · GLOBAL ROSTER</span>
+                  <span className="home-reg-portal-name">spaceappschallenge.org</span>
+                </div>
+                <h3 className="home-reg-phase-title">1. Official NASA Hackathon</h3>
+                <ul className="home-reg-phase-list">
+                  <li><strong>Account Setup:</strong> Every member creates an account on <code>spaceappschallenge.org</code>.</li>
+                  <li><strong>Local Event:</strong> Search &quot;Haldwani&quot; & click &quot;Sign Up For This Local Event&quot;.</li>
+                  <li><strong>Team Formation:</strong> Leader creates the team in the Teams tab; members join.</li>
+                </ul>
+                <div className="home-reg-phase-footer">
+                  <a href={officialUrl} target="_blank" rel="noopener noreferrer" className="home-reg-link">
+                    <span>Open NASA Portal</span>
+                    <ExternalLink size={14} />
+                  </a>
+                </div>
+              </div>
+
+              {/* Phase 2 Tile */}
+              <div className="home-reg-phase-card">
+                <div className="home-reg-phase-top">
+                  <span className="home-reg-phase-pill pill-cyan">PHASE 02 · COLLEGE VENUE</span>
+                  <span className="home-reg-portal-name cyan">bias-nsac</span>
+                </div>
+                <h3 className="home-reg-phase-title">2. BIAS-NSAC College Portal</h3>
+                <ul className="home-reg-phase-list">
+                  <li><strong>Leader Signup:</strong> Team leader registers on BIAS-NSAC and verifies Gmail.</li>
+                  <li><strong>Match Details:</strong> Enter exact same team name, members, and participation mode.</li>
+                  <li><strong>Passes:</strong> Submit to generate digital ID cards & verify official status.</li>
+                </ul>
+                <div className="home-reg-phase-footer">
+                  <Link to="/register" className="home-reg-link">
+                    <span>Register on BIAS-NSAC</span>
+                    <ArrowRight size={14} />
+                  </Link>
+                </div>
+              </div>
+            </div>
+
+            {/* Right Column: Visual Screenshot Reference Preview Card */}
+            <div className="home-reg-player-col">
+              <div className="home-reg-preview-card">
+                <div className="home-preview-header">
+                  <div className="home-preview-tabs">
+                    <button
+                      type="button"
+                      className={`home-tab-pill ${homeRegTab === 'nasa' ? 'active' : ''}`}
+                      onClick={() => {
+                        setHomeRegTab('nasa');
+                        setHomeRegPreviewIdx(0);
+                      }}
+                    >
+                      <Globe2 size={13} />
+                      <span>NASA Portal (10)</span>
+                    </button>
+                    <button
+                      type="button"
+                      className={`home-tab-pill ${homeRegTab === 'bias' ? 'active' : ''}`}
+                      onClick={() => {
+                        setHomeRegTab('bias');
+                        setHomeRegPreviewIdx(0);
+                      }}
+                    >
+                      <Rocket size={13} />
+                      <span>BIAS-NSAC (8)</span>
+                    </button>
+                  </div>
+                  <span className="home-preview-badge-pill">SCREENSHOTS</span>
+                </div>
+
+                <div className="home-preview-main">
+                  <div className="home-preview-browser-frame">
+                    <div className="home-browser-dots">
+                      <span />
+                      <span />
+                      <span />
+                    </div>
+                    <span className="home-browser-url">
+                      {homeRegTab === 'nasa' ? 'spaceappschallenge.org · Official Portal' : 'bias-nsac.in/portal · College Registration'}
+                    </span>
+                    <span className="home-browser-step-badge">{currentHomePreview.step}</span>
+                  </div>
+
+                  <Link to="/how-to-register" className="home-preview-img-container" title="Click to view complete screenshot guide">
+                    <img
+                      src={currentHomePreview.img}
+                      alt={currentHomePreview.title}
+                      loading="lazy"
+                      className="home-preview-img"
+                    />
+                    <div className="home-preview-zoom-overlay">
+                      <span className="home-preview-zoom-tag">
+                        <Eye size={15} />
+                        <span>View Full 21 Step Screenshots</span>
+                      </span>
+                    </div>
+                  </Link>
+
+                  <div className="home-preview-details">
+                    <div className="home-preview-caption">
+                      <h4>{currentHomePreview.title}</h4>
+                      <p>{currentHomePreview.desc}</p>
+                    </div>
+
+                    {/* Miniature thumbnail reel */}
+                    <div className="home-preview-thumbnails">
+                      {activeHomeList.map((item, idx) => (
+                        <button
+                          key={item.step}
+                          type="button"
+                          className={`home-thumb-btn ${idx === homeRegPreviewIdx ? 'active' : ''}`}
+                          onClick={() => setHomeRegPreviewIdx(idx)}
+                          aria-label={`Preview ${item.step}`}
+                        >
+                          <img src={item.img} alt="" loading="lazy" />
+                          <span>{item.step}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="home-preview-footer">
+                  <Link to="/how-to-register" className="home-player-cta-link">
+                    <span>Explore All 21 Step-by-Step Screenshots</span>
+                    <ArrowUpRight size={15} />
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Master Call to Action Bar */}
+          <div className="home-reg-guide-actions">
+            <Link to="/how-to-register" className="button button-primary home-reg-full-guide-btn">
+              <span>View Full Step-by-Step Guide</span>
+              <ArrowRight size={17} />
+            </Link>
+            <span className="home-reg-note">
+              <Sparkles size={14} className="text-accent" />
+              <span>Interactive 21-step checklist & tabbed walkthrough</span>
+            </span>
+          </div>
+        </div>
+      </section>
 
       {/* Schedule Section - "3 Days" */}
       <section className="section immersive-section home-flight-plan">

@@ -452,30 +452,62 @@ export default function Home() {
         <div className="flight-plan-grid">
           {schedule.map((day) => {
             const [date, month] = day.date.split(' ');
+            const phaseLabel = day.day === '01'
+              ? 'PHASE 01 // LAUNCH & KICKOFF'
+              : day.day === '02'
+                ? 'PHASE 02 // 24-HR BUILD SPRINT'
+                : 'PHASE 03 // JURY & FINALE';
 
             return (
               <Link to="/venue-schedule" className="flight-plan-card" key={day.day}>
-                <div className="flight-plan-card-header">
-                  <div className="flight-plan-date">
-                    <strong>{date}</strong>
-                    <span>
-                      <small>{month === 'NOV' ? 'NOVEMBER' : month}</small>
-                      <small>2026</small>
+                <div className="flight-plan-card-top-group">
+                  <div className="flight-plan-card-header">
+                    <div className="flight-plan-date">
+                      <strong>{date}</strong>
+                      <div className="flight-plan-date-meta">
+                        <span className="flight-plan-month">{month === 'NOV' ? 'NOVEMBER' : month}</span>
+                        <span className="flight-plan-year">2026</span>
+                      </div>
+                    </div>
+                    <span className="flight-plan-day">
+                      <span className="flight-plan-day-pulse" />
+                      DAY {day.day}
                     </span>
                   </div>
-                  <span className="flight-plan-day">DAY {day.day}</span>
+
+                  <div className="flight-plan-card-body">
+                    <span className="flight-plan-phase-tag">{phaseLabel}</span>
+                    <h3 className="flight-plan-title">{day.title}</h3>
+
+                    <ol className="flight-plan-activities">
+                      {day.activities.map((activity, index) => (
+                        <li key={activity}>
+                          <span className="flight-plan-activity-number">
+                            {String(index + 1).padStart(2, '0')}
+                          </span>
+                          <span className="flight-plan-activity-text">{activity}</span>
+                        </li>
+                      ))}
+                      {day.day === '03' && (
+                        <li className="flight-plan-activity-highlight">
+                          <span className="flight-plan-activity-number highlight">
+                            <Trophy size={11} />
+                          </span>
+                          <span className="flight-plan-activity-text highlight">
+                            Awards & Global Nominee Reveal
+                          </span>
+                        </li>
+                      )}
+                    </ol>
+                  </div>
                 </div>
-                <h3>{day.title}</h3>
-                <ol className="flight-plan-activities">
-                  {day.activities.map((activity, index) => (
-                    <li key={activity}>
-                      <span className="flight-plan-activity-number">
-                        {String(index + 1).padStart(2, '0')}
-                      </span>
-                      <span>{activity}</span>
-                    </li>
-                  ))}
-                </ol>
+
+                <div className="flight-plan-card-footer">
+                  <span className="flight-plan-cta-label">
+                    <span>Explore Day {day.day} Schedule</span>
+                    <ArrowRight size={14} className="flight-plan-cta-arrow" />
+                  </span>
+                </div>
               </Link>
             );
           })}

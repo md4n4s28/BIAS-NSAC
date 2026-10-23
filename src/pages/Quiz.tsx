@@ -21,6 +21,10 @@ import {
   AlertTriangle,
   Clock,
   Timer,
+  Download,
+  MessageCircle,
+  Send,
+  UserCheck,
 } from 'lucide-react';
 import {
   questions,
@@ -35,6 +39,7 @@ import {
   type MatchQuestion,
 } from '../data/quiz';
 import { PageIntro } from '../components/UI';
+import { useAuth } from '../lib/auth';
 
 export default function Quiz() {
   const [started, setStarted] = useState(false);
@@ -44,6 +49,18 @@ export default function Quiz() {
   const [reviewFilter, setReviewFilter] = useState<'all' | 'correct' | 'incorrect'>('all');
   const [copiedNotification, setCopiedNotification] = useState(false);
   const [hintsRevealed, setHintsRevealed] = useState<Record<number, boolean>>({});
+
+  const { user } = useAuth();
+  const [candidateName, setCandidateName] = useState('');
+  const [callsignPrefix, setCallsignPrefix] = useState('Cadet');
+  const [postCopied, setPostCopied] = useState(false);
+
+  useEffect(() => {
+    if (user?.email && !candidateName) {
+      const emailName = user.email.split('@')[0];
+      setCandidateName(emailName.charAt(0).toUpperCase() + emailName.slice(1));
+    }
+  }, [user]);
 
   const getInitialAnswers = (): UserAnswerValue[] => {
     return questions.map((q) => {
@@ -210,6 +227,215 @@ export default function Quiz() {
     setTimeout(() => setCopiedNotification(false), 3000);
   };
 
+  const resolvedName = candidateName.trim() || 'Explorer';
+  const fullDisplayName = callsignPrefix ? `${callsignPrefix} ${resolvedName}` : resolvedName;
+
+  const downloadSocialCard = () => {
+    const canvas = document.createElement('canvas');
+    canvas.width = 1080;
+    canvas.height = 1080;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    // Deep space gradient
+    const bgGrad = ctx.createLinearGradient(0, 0, 1080, 1080);
+    bgGrad.addColorStop(0, '#060810');
+    bgGrad.addColorStop(0.5, '#0B1124');
+    bgGrad.addColorStop(1, '#05070D');
+    ctx.fillStyle = bgGrad;
+    ctx.fillRect(0, 0, 1080, 1080);
+
+    // Nebula glow
+    const radGlow = ctx.createRadialGradient(540, 480, 50, 540, 480, 480);
+    radGlow.addColorStop(0, 'rgba(229, 185, 56, 0.16)');
+    radGlow.addColorStop(0.5, 'rgba(21, 101, 192, 0.12)');
+    radGlow.addColorStop(1, 'rgba(0, 0, 0, 0)');
+    ctx.fillStyle = radGlow;
+    ctx.fillRect(0, 0, 1080, 1080);
+
+    // Starfield particles
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.75)';
+    const stars = [
+      [80, 120, 2], [180, 300, 1.5], [300, 80, 2.5], [920, 150, 1.5],
+      [980, 340, 2], [140, 800, 2], [880, 780, 2], [960, 920, 1.5],
+      [220, 940, 2.5], [520, 120, 1.5], [780, 240, 2], [80, 520, 1.5],
+      [1000, 600, 2.5], [450, 980, 2], [650, 90, 1.5], [380, 860, 2]
+    ];
+    for (const [sx, sy, sr] of stars) {
+      ctx.beginPath();
+      ctx.arc(sx, sy, sr, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // Outer Gold Borders
+    ctx.strokeStyle = 'rgba(229, 185, 56, 0.55)';
+    ctx.lineWidth = 3;
+    ctx.strokeRect(40, 40, 1000, 1000);
+
+    ctx.strokeStyle = 'rgba(229, 185, 56, 0.2)';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(52, 52, 976, 976);
+
+    const drawRoundRect = (x: number, y: number, w: number, h: number, r: number) => {
+      ctx.beginPath();
+      ctx.moveTo(x + r, y);
+      ctx.arcTo(x + w, y, x + w, y + h, r);
+      ctx.arcTo(x + w, y + h, x, y + h, r);
+      ctx.arcTo(x, y + h, x, y, r);
+      ctx.arcTo(x, y, x + w, y, r);
+      ctx.closePath();
+    };
+
+    // Header Title
+    ctx.textAlign = 'center';
+    ctx.fillStyle = '#E5B938';
+    ctx.font = 'bold 22px "Space Grotesk", sans-serif';
+    ctx.fillText('NASA INTERNATIONAL SPACE APPS CHALLENGE 2026', 540, 115);
+
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.75)';
+    ctx.font = '600 16px "Space Grotesk", sans-serif';
+    ctx.fillText('BIAS BHIMTAL · UTTARAKHAND, INDIA · OFFICIAL MISSION LOG', 540, 145);
+
+    // Decorative line
+    ctx.strokeStyle = 'rgba(229, 185, 56, 0.4)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(180, 175);
+    ctx.lineTo(900, 175);
+    ctx.stroke();
+
+    const currentRank = getRank(correctCount);
+
+    // Rank Badge
+    ctx.fillStyle = 'rgba(229, 185, 56, 0.12)';
+    ctx.strokeStyle = 'rgba(229, 185, 56, 0.6)';
+    ctx.lineWidth = 1.5;
+    drawRoundRect(280, 215, 520, 52, 26);
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.fillStyle = '#F5D76E';
+    ctx.font = 'bold 20px "Space Grotesk", sans-serif';
+    ctx.fillText(`★ OFFICIAL DESIGNATION: ${currentRank.title.toUpperCase()} ★`, 540, 248);
+
+    // Candidate Name
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.65)';
+    ctx.font = '600 18px "Space Grotesk", sans-serif';
+    ctx.fillText('THIS CERTIFIES COSMIC INTELLIGENCE CLEARANCE FOR', 540, 335);
+
+    ctx.fillStyle = '#FFFFFF';
+    ctx.font = 'bold 50px "Space Grotesk", sans-serif';
+    ctx.shadowColor = 'rgba(229, 185, 56, 0.4)';
+    ctx.shadowBlur = 14;
+    ctx.fillText(fullDisplayName, 540, 400);
+    ctx.shadowBlur = 0;
+
+    // Metrics Box
+    ctx.fillStyle = 'rgba(16, 22, 38, 0.85)';
+    ctx.strokeStyle = 'rgba(229, 185, 56, 0.35)';
+    ctx.lineWidth = 1.5;
+    drawRoundRect(120, 460, 840, 220, 16);
+    ctx.fill();
+    ctx.stroke();
+
+    // Metric 1: Score
+    ctx.fillStyle = '#E5B938';
+    ctx.font = 'bold 50px "Space Grotesk", sans-serif';
+    ctx.fillText(`${correctCount} / ${questions.length}`, 260, 550);
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+    ctx.font = '600 16px "Space Grotesk", sans-serif';
+    ctx.fillText('MISSION SCORE', 260, 595);
+
+    // Divider 1
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(400, 485);
+    ctx.lineTo(400, 655);
+    ctx.stroke();
+
+    // Metric 2: Accuracy
+    const pct = Math.round((correctCount / questions.length) * 100);
+    ctx.fillStyle = '#64D7FF';
+    ctx.font = 'bold 50px "Space Grotesk", sans-serif';
+    ctx.fillText(`${pct}%`, 540, 550);
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+    ctx.font = '600 16px "Space Grotesk", sans-serif';
+    ctx.fillText('ACCURACY RATING', 540, 595);
+
+    // Divider 2
+    ctx.beginPath();
+    ctx.moveTo(680, 485);
+    ctx.lineTo(680, 655);
+    ctx.stroke();
+
+    // Metric 3: Time
+    ctx.fillStyle = '#10B981';
+    ctx.font = 'bold 50px "Space Grotesk", sans-serif';
+    ctx.fillText(formatTimerFriendly(secondsElapsed), 820, 550);
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+    ctx.font = '600 16px "Space Grotesk", sans-serif';
+    ctx.fillText('FLIGHT TIME', 820, 595);
+
+    // Status Pill
+    ctx.fillStyle = 'rgba(229, 185, 56, 0.12)';
+    ctx.strokeStyle = 'rgba(229, 185, 56, 0.45)';
+    ctx.lineWidth = 1;
+    drawRoundRect(220, 725, 640, 44, 22);
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.fillStyle = '#F5D76E';
+    ctx.font = 'bold 15px "Space Grotesk", sans-serif';
+    ctx.fillText('VERIFIED MISSION LOG · HACKATHON CANDIDATE ACCREDITATION', 540, 752);
+
+    // Event Info Footer
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
+    ctx.font = 'bold 18px "Space Grotesk", sans-serif';
+    ctx.fillText('BIRLA INSTITUTE OF APPLIED SCIENCES · 14–16 NOVEMBER 2026', 540, 830);
+
+    // Hashtags
+    ctx.fillStyle = '#E5B938';
+    ctx.font = '600 17px "Space Grotesk", sans-serif';
+    ctx.fillText('#NASASpaceApps2026   #BIASNSAC   #Astroverse   #SpaceAppsChallenge', 540, 885);
+
+    // URL
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+    ctx.font = '15px "Space Grotesk", sans-serif';
+    ctx.fillText('http://nsac.birlainstitute.co.in/quiz', 540, 935);
+
+    // Download image
+    const imageURL = canvas.toDataURL('image/png');
+    const a = document.createElement('a');
+    a.href = imageURL;
+    const cleanFile = fullDisplayName.replace(/[^a-zA-Z0-9_-]/g, '_');
+    a.download = `NASA_SpaceApps_Quiz_${cleanFile}.png`;
+    a.click();
+  };
+
+  const getShareCaption = () => {
+    const currentRank = getRank(correctCount);
+    const pct = Math.round((correctCount / questions.length) * 100);
+    return `🚀 I just tested my cosmic IQ on the NASA Space Apps Challenge 2026 Quiz!
+
+👨‍🚀 Cadet: ${fullDisplayName}
+🏆 Designation: ${currentRank.title}
+🎯 Score: ${correctCount}/${questions.length} (${pct}% Accuracy)
+⏱️ Flight Time: ${formatTimerFriendly(secondsElapsed)} (${formatTimer(secondsElapsed)})
+
+🌌 Join the hackathon at Birla Institute of Applied Sciences (BIAS), Bhimtal!
+🔗 Take the quiz: http://nsac.birlainstitute.co.in/quiz
+
+#NASASpaceApps2026 #BIASNSAC #Astroverse #SpaceAppsChallenge #Hackathon2026 #SpaceScience #Bhimtal`;
+  };
+
+  const copySocialCaption = () => {
+    const caption = getShareCaption();
+    navigator.clipboard?.writeText(caption);
+    setPostCopied(true);
+    setTimeout(() => setPostCopied(false), 3000);
+  };
+
   // Category stats calculation for results
   const categoriesMap = questions.reduce<Record<string, { total: number; correct: number }>>(
     (acc, q, pos) => {
@@ -370,6 +596,172 @@ export default function Quiz() {
                 </>
               )}
             </button>
+          </div>
+
+          {/* Social Media Share Studio / Instagram Post Creator */}
+          <div className="social-share-studio">
+            <div className="studio-header">
+              <span className="studio-badge">
+                <Sparkles size={15} /> INSTAGRAM & SOCIAL MEDIA POST CREATOR
+              </span>
+              <h3>Claim & Share Your Official Mission Clearance</h3>
+              <p>
+                Enter your name below to personalize your official square Instagram & social post. Download high-resolution PNG or copy ready-to-share captions with official event hashtags.
+              </p>
+            </div>
+
+            {/* Customization Input Controls */}
+            <div className="studio-customizer">
+              <div className="customizer-field">
+                <label htmlFor="callsign-prefix">TITLE / CALLSIGN</label>
+                <select
+                  id="callsign-prefix"
+                  value={callsignPrefix}
+                  onChange={(e) => setCallsignPrefix(e.target.value)}
+                  className="studio-select"
+                >
+                  <option value="Cadet">Cadet</option>
+                  <option value="Commander">Commander</option>
+                  <option value="Flight Officer">Flight Officer</option>
+                  <option value="Specialist">Specialist</option>
+                  <option value="Astronaut">Astronaut</option>
+                  <option value="">None (Name Only)</option>
+                </select>
+              </div>
+
+              <div className="customizer-field customizer-name-field">
+                <label htmlFor="candidate-name">YOUR FULL NAME / CODENAME</label>
+                <div className="name-input-wrap">
+                  <UserCheck size={16} className="name-input-icon" />
+                  <input
+                    id="candidate-name"
+                    type="text"
+                    value={candidateName}
+                    onChange={(e) => setCandidateName(e.target.value)}
+                    placeholder="Enter your name (e.g. Mohd Anas)"
+                    maxLength={32}
+                    className="studio-input"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Live Interactive Post Preview (1:1 Square Instagram Format) */}
+            <div className="social-post-preview-wrapper">
+              <div className="social-post-card">
+                {/* Post Header */}
+                <div className="post-card-header">
+                  <div className="post-header-brand">
+                    <img src="/img/event-mark.png" alt="" width="36" height="36" />
+                    <div>
+                      <span className="post-event-title">NASA SPACE APPS CHALLENGE 2026</span>
+                      <small className="post-venue-sub">BIAS BHIMTAL · UTTARAKHAND, INDIA</small>
+                    </div>
+                  </div>
+                  <span className="post-badge-verified">OFFICIAL MISSION LOG</span>
+                </div>
+
+                {/* Post Body: Rank Badge & Name */}
+                <div className="post-card-body">
+                  <div className="post-rank-pill">
+                    <span>{getRank(correctCount).badge}</span>
+                    <strong>{getRank(correctCount).title.toUpperCase()}</strong>
+                  </div>
+
+                  <span className="post-accredit-text">THIS CERTIFIES COSMIC CLEARANCE FOR</span>
+                  <h2 className="post-candidate-name">{fullDisplayName}</h2>
+
+                  {/* 3 Metric Pillars */}
+                  <div className="post-metrics-row">
+                    <div className="post-metric-col">
+                      <span className="metric-val">{correctCount}/{questions.length}</span>
+                      <span className="metric-lbl">SCORE</span>
+                    </div>
+                    <div className="post-metric-divider" />
+                    <div className="post-metric-col">
+                      <span className="metric-val">{Math.round((correctCount / questions.length) * 100)}%</span>
+                      <span className="metric-lbl">ACCURACY</span>
+                    </div>
+                    <div className="post-metric-divider" />
+                    <div className="post-metric-col">
+                      <span className="metric-val">{formatTimerFriendly(secondsElapsed)}</span>
+                      <span className="metric-lbl">FLIGHT TIME</span>
+                    </div>
+                  </div>
+
+                  <div className="post-clearance-stamp">
+                    ★ VERIFIED CANDIDATE · CONTINUOUS 3-DAY HACKATHON ★
+                  </div>
+                </div>
+
+                {/* Post Footer */}
+                <div className="post-card-footer">
+                  <div className="post-footer-details">
+                    <span>BIRLA INSTITUTE OF APPLIED SCIENCES · 14–16 NOV 2026</span>
+                    <strong className="post-hashtags">#NASASpaceApps2026 #BIASNSAC #Astroverse #SpaceAppsChallenge</strong>
+                  </div>
+                  <span className="post-url-tag">nsac.birlainstitute.co.in</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Social Share & Download Buttons */}
+            <div className="studio-actions-grid">
+              <button
+                type="button"
+                className="button button-gold-pulse studio-btn-primary"
+                onClick={downloadSocialCard}
+              >
+                <Download size={18} /> Download Instagram Post (PNG)
+              </button>
+
+              <button
+                type="button"
+                className="button button-secondary studio-btn-secondary"
+                onClick={copySocialCaption}
+              >
+                {postCopied ? (
+                  <>
+                    <Check size={18} /> Caption & Hashtags Copied!
+                  </>
+                ) : (
+                  <>
+                    <Copy size={18} /> Copy Caption & Hashtags
+                  </>
+                )}
+              </button>
+            </div>
+
+            {/* Quick Share to Social Channels */}
+            <div className="social-quick-share-row">
+              <span className="quick-share-label">SHARE DIRECTLY:</span>
+              <div className="quick-share-links">
+                <a
+                  href={`https://api.whatsapp.com/send?text=${encodeURIComponent(getShareCaption())}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="quick-share-chip whatsapp"
+                >
+                  <MessageCircle size={15} /> WhatsApp
+                </a>
+                <a
+                  href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(getShareCaption())}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="quick-share-chip twitter"
+                >
+                  <Send size={15} /> X / Twitter
+                </a>
+                <a
+                  href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent('http://nsac.birlainstitute.co.in/quiz')}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="quick-share-chip linkedin"
+                >
+                  <Share2 size={15} /> LinkedIn
+                </a>
+              </div>
+            </div>
           </div>
 
           {/* Interactive Review Section */}

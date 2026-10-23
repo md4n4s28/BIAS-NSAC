@@ -290,63 +290,72 @@ export default function Auth({
           </p>
         )}
 
-        {['login', 'admin'].includes(mode) && (
-          <div className="auth-switch">
-            <span>Forgot your password?</span>
-            <Link className="auth-switch-link" to="/forgot-password">
-              Reset password <ArrowRight size={16} />
-            </Link>
-          </div>
-        )}
+        <div className="auth-switches">
+          {['login', 'admin'].includes(mode) && (
+            <div className="auth-switch">
+              <span className="auth-switch-label">Forgot your password?</span>
+              <Link className="auth-switch-link" to="/forgot-password">
+                <span>Reset password</span>
+                <ArrowRight size={14} />
+              </Link>
+            </div>
+          )}
 
-        {mode === 'login' && (
-          <div className="auth-switch">
-            <span>Team leader?</span>
-            <Link className="auth-switch-link" to="/signup">
-              Create an account <ArrowRight size={16} />
-            </Link>
-          </div>
-        )}
-        {mode === 'signup' && (
-          <div className="auth-switch">
-            <span>Already have an account?</span>
-            <Link className="auth-switch-link" to="/login">
-              Sign in <ArrowRight size={16} />
-            </Link>
-          </div>
-        )}
-        {mode === 'admin' && (
-          <div className="auth-switch">
-            <span>Need an account?</span>
-            <Link className="auth-switch-link" to="/signup">
-              Create account <ArrowRight size={16} />
-            </Link>
-          </div>
-        )}
-        {mode === 'recover' && (
-          <>
+          {mode === 'login' && (
             <div className="auth-switch">
-              <span>Remember your password?</span>
-              <Link className="auth-switch-link" to="/login">
-                Sign in <ArrowRight size={16} />
-              </Link>
-            </div>
-            <div className="auth-switch">
-              <span>Need a new account?</span>
+              <span className="auth-switch-label">Team leader?</span>
               <Link className="auth-switch-link" to="/signup">
-                Create an account <ArrowRight size={16} />
+                <span>Create an account</span>
+                <ArrowRight size={14} />
               </Link>
             </div>
-          </>
-        )}
-        {mode === 'reset' && (
-          <div className="auth-switch">
-            <span>Back to account?</span>
-            <Link className="auth-switch-link" to="/login">
-              Sign in <ArrowRight size={16} />
-            </Link>
-          </div>
-        )}
+          )}
+          {mode === 'signup' && (
+            <div className="auth-switch">
+              <span className="auth-switch-label">Already have an account?</span>
+              <Link className="auth-switch-link" to="/login">
+                <span>Sign in</span>
+                <ArrowRight size={14} />
+              </Link>
+            </div>
+          )}
+          {mode === 'admin' && (
+            <div className="auth-switch">
+              <span className="auth-switch-label">Need an account?</span>
+              <Link className="auth-switch-link" to="/signup">
+                <span>Create account</span>
+                <ArrowRight size={14} />
+              </Link>
+            </div>
+          )}
+          {mode === 'recover' && (
+            <>
+              <div className="auth-switch">
+                <span className="auth-switch-label">Remember your password?</span>
+                <Link className="auth-switch-link" to="/login">
+                  <span>Sign in</span>
+                  <ArrowRight size={14} />
+                </Link>
+              </div>
+              <div className="auth-switch">
+                <span className="auth-switch-label">Need a new account?</span>
+                <Link className="auth-switch-link" to="/signup">
+                  <span>Create an account</span>
+                  <ArrowRight size={14} />
+                </Link>
+              </div>
+            </>
+          )}
+          {mode === 'reset' && (
+            <div className="auth-switch">
+              <span className="auth-switch-label">Back to account?</span>
+              <Link className="auth-switch-link" to="/login">
+                <span>Sign in</span>
+                <ArrowRight size={14} />
+              </Link>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

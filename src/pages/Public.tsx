@@ -18,9 +18,16 @@ import {
   Mail,
   Phone,
   Send,
+  Clock,
+  Sparkles,
+  Trophy,
+  CheckCircle2,
+  Compass,
+  ArrowRight,
+  ExternalLink,
 } from 'lucide-react';
 import { ButtonLink, Notice, PageIntro } from '../components/UI';
-import { directionsUrl, itineraryPdfUrl, officialRegistrationUrl, officialUrl, schedule, venueMapEmbedUrl } from '../data/event';
+import { detailedSchedule, directionsUrl, itineraryPdfUrl, officialRegistrationUrl, officialUrl, organizerContacts, schedule, venueMapEmbedUrl } from '../data/event';
 
 export function About() {
   return (
@@ -149,94 +156,311 @@ export function Highlights() {
 }
 
 export function Schedule() {
+  const [selectedDay, setSelectedDay] = useState<string>('all');
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+
+  const categories = [
+    { id: 'all', label: 'All Activities' },
+    { id: 'Hacking', label: 'Hacking & Building' },
+    { id: 'Mentorship', label: 'Mentorship Syncs' },
+    { id: 'Evaluation', label: 'Evaluation & Pitches' },
+    { id: 'Ceremony', label: 'Keynotes & Ceremonies' },
+    { id: 'Food', label: 'Meals & Energy' },
+  ];
+
+  const displayedDays = selectedDay === 'all'
+    ? detailedSchedule
+    : detailedSchedule.filter((d) => d.day === selectedDay);
+
+  const getCategoryClass = (cat: string) => {
+    switch (cat) {
+      case 'Registration': return 'cat-cyan';
+      case 'Ceremony': return 'cat-purple';
+      case 'Briefing': return 'cat-sky';
+      case 'Hacking': return 'cat-gold';
+      case 'Mentorship': return 'cat-green';
+      case 'Food': return 'cat-orange';
+      case 'Evaluation': return 'cat-fuchsia';
+      case 'Milestone': return 'cat-rose';
+      default: return 'cat-gold';
+    }
+  };
+
   return (
     <div className="page schedule-page">
       <PageIntro eyebrow="14–16 NOVEMBER 2026 · BHIMTAL" title="Three days to turn ideas into action.">
-        A proposed programme for the local NASA International Space Apps Challenge at Birla Institute of Applied Sciences.
+        The official mission flight plan and continuous 3-day itinerary for the NASA International Space Apps Challenge at Birla Institute of Applied Sciences (BIAS Bhimtal).
       </PageIntro>
 
-      <div className="schedule-overview">
-        <div className="schedule-overview-item">
-          <CalendarDays size={18} aria-hidden="true" />
-          <span><strong>14–16 November 2026</strong><small>Three days of collaboration</small></span>
+      {/* Top Telemetry Info & Quick Action Grid */}
+      <div className="schedule-telemetry-banner">
+        <div className="schedule-telemetry-grid">
+          <div className="schedule-telemetry-card">
+            <div className="telemetry-card-icon">
+              <CalendarDays size={20} />
+            </div>
+            <div className="telemetry-card-content">
+              <span className="telemetry-card-label">MISSION WINDOW</span>
+              <strong>14–16 November 2026</strong>
+              <small>3-Day Continuous Hackathon</small>
+            </div>
+          </div>
+
+          <div className="schedule-telemetry-card">
+            <div className="telemetry-card-icon">
+              <MapPin size={20} />
+            </div>
+            <div className="telemetry-card-content">
+              <span className="telemetry-card-label">EVENT VENUE</span>
+              <strong>BIAS Bhimtal Campus</strong>
+              <small>Nainital, Uttarakhand, India</small>
+            </div>
+          </div>
+
+          <div className="schedule-telemetry-card">
+            <div className="telemetry-card-icon">
+              <Sparkles size={20} />
+            </div>
+            <div className="telemetry-card-content">
+              <span className="telemetry-card-label">PARTICIPATION MODE</span>
+              <strong>Dual Track (Onsite + Virtual)</strong>
+              <small>14 NASA Global Challenges</small>
+            </div>
+          </div>
         </div>
-        <a
-          className="schedule-itinerary-btn"
-          href={itineraryPdfUrl}
-          download="BIAS-NSAC-2026-Itinerary.pdf"
-          target="_blank"
-          rel="noreferrer"
-          title="Download the proposed event itinerary (PDF)"
-        >
-          <Download size={15} aria-hidden="true" />
-          <span>Download itinerary</span>
-        </a>
-        <div className="schedule-overview-item">
-          <MapPin size={18} aria-hidden="true" />
-          <span><strong>Birla Institute of Applied Sciences</strong><small>Bhimtal, Uttarakhand</small></span>
+
+        <div className="schedule-telemetry-actions">
+          <a
+            className="schedule-download-action-btn"
+            href={itineraryPdfUrl}
+            download="BIAS-NSAC-2026-Itinerary.pdf"
+            target="_blank"
+            rel="noreferrer"
+            title="Download the proposed event itinerary (PDF)"
+          >
+            <Download size={16} />
+            <span>Download Official Itinerary (PDF · 931 KB)</span>
+          </a>
+          <a
+            className="schedule-directions-action-btn"
+            href={directionsUrl}
+            target="_blank"
+            rel="noreferrer"
+          >
+            <MapPin size={15} />
+            <span>Campus Directions on Google Maps</span>
+            <ArrowUpRight size={14} />
+          </a>
         </div>
-        <a className="schedule-directions" href={directionsUrl} target="_blank" rel="noreferrer">
-          Get directions <ArrowUpRight size={15} aria-hidden="true" />
-        </a>
       </div>
 
-      <nav className="schedule-day-nav" aria-label="Jump to a schedule day">
-        {schedule.map((day) => (
-          <a href={`#schedule-day-${day.day}`} key={day.day}>
-            <span>DAY {day.day}</span>
-            <strong>{day.date}</strong>
-          </a>
-        ))}
-      </nav>
+      {/* Interactive Day Filter Tabs */}
+      <div className="schedule-controls-bar">
+        <div className="schedule-day-tabs" role="tablist" aria-label="Select Hackathon Day">
+          <button
+            type="button"
+            className={`schedule-day-tab-btn ${selectedDay === 'all' ? 'active' : ''}`}
+            onClick={() => setSelectedDay('all')}
+          >
+            <span className="day-tab-kicker">FULL MISSION</span>
+            <strong className="day-tab-title">All 3 Days</strong>
+          </button>
+          {detailedSchedule.map((day) => (
+            <button
+              type="button"
+              key={day.day}
+              className={`schedule-day-tab-btn ${selectedDay === day.day ? 'active' : ''}`}
+              onClick={() => setSelectedDay(day.day)}
+            >
+              <span className="day-tab-kicker">DAY {day.day} · {day.date}</span>
+              <strong className="day-tab-title">{day.title}</strong>
+            </button>
+          ))}
+        </div>
 
-      <div className="schedule-days">
-        {schedule.map((day) => {
-          const [date, month] = day.date.split(' ');
+        {/* Category Filters */}
+        <div className="schedule-category-filters" aria-label="Filter by activity category">
+          <span className="category-filter-hint">Filter track:</span>
+          <div className="category-chips-row">
+            {categories.map((cat) => (
+              <button
+                type="button"
+                key={cat.id}
+                className={`category-chip-btn ${selectedCategory === cat.id ? 'active' : ''}`}
+                onClick={() => setSelectedCategory(cat.id)}
+              >
+                {cat.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Day Cards with Detailed Activity Timelines */}
+      <div className="schedule-days-container">
+        {displayedDays.map((day) => {
+          const filteredActivities = day.activities.filter(
+            (act) => selectedCategory === 'all' || act.category === selectedCategory
+          );
+
           return (
             <article className="schedule-day-card" id={`schedule-day-${day.day}`} key={day.day}>
               <header className="schedule-day-header">
                 <div className="schedule-date-block">
-                  <span className="schedule-day-index">DAY {day.day}</span>
-                  <div className="schedule-date">
-                    <strong>{date}</strong>
-                    <span>{month}<small>2026</small></span>
+                  <span className="schedule-day-badge">
+                    <span className="schedule-badge-dot" />
+                    DAY {day.day}
+                  </span>
+                  <div className="schedule-date-display">
+                    <strong>{day.date.split(' ')[0]}</strong>
+                    <div className="schedule-date-meta">
+                      <span>NOVEMBER</span>
+                      <small>2026</small>
+                    </div>
                   </div>
                 </div>
+
                 <div className="schedule-day-intro">
-                  <span className="schedule-kicker">THE PROGRAMME</span>
-                  <h2>{day.title}</h2>
-                  <p>{day.note}</p>
+                  <span className="schedule-phase-kicker">{day.phase}</span>
+                  <h2 className="schedule-day-title">{day.title}</h2>
+                  <p className="schedule-day-subtitle">{day.subtitle}</p>
+                  {day.note && (
+                    <div className="schedule-day-note-badge">
+                      <Clock size={13} />
+                      <span>{day.note}</span>
+                    </div>
+                  )}
                 </div>
               </header>
-              <ol className="schedule-activity-list">
-                {day.activities.map((activity, index) => (
-                  <li key={activity}>
-                    <span className="schedule-activity-number">{String(index + 1).padStart(2, '0')}</span>
-                    <span className="schedule-activity-name">{activity}</span>
-                    <span className="schedule-time"><span aria-hidden="true" />Time to be announced</span>
-                  </li>
-                ))}
-              </ol>
+
+              {filteredActivities.length === 0 ? (
+                <div className="schedule-empty-activities">
+                  <p>No activities matching "{categories.find(c => c.id === selectedCategory)?.label}" on Day {day.day}.</p>
+                  <button
+                    type="button"
+                    className="button button-secondary text-sm"
+                    onClick={() => setSelectedCategory('all')}
+                  >
+                    Reset Category Filter
+                  </button>
+                </div>
+              ) : (
+                <ol className="schedule-activity-list">
+                  {filteredActivities.map((activity) => (
+                    <li
+                      key={activity.title}
+                      className={`schedule-activity-item ${activity.isHighlight ? 'is-highlight' : ''}`}
+                    >
+                      <div className="schedule-activity-time-col">
+                        <span className="schedule-time-badge">
+                          <Clock size={13} />
+                          <span>{activity.time}</span>
+                        </span>
+                        <span className={`schedule-category-badge ${getCategoryClass(activity.category)}`}>
+                          {activity.category}
+                        </span>
+                      </div>
+
+                      <div className="schedule-activity-main-col">
+                        <div className="schedule-activity-heading-row">
+                          <h3 className="schedule-activity-title">{activity.title}</h3>
+                          {activity.isHighlight && (
+                            <span className="schedule-milestone-tag">
+                              <Sparkles size={12} />
+                              <span>KEY MILESTONE</span>
+                            </span>
+                          )}
+                        </div>
+
+                        <p className="schedule-activity-desc">{activity.desc}</p>
+
+                        <div className="schedule-activity-location-row">
+                          <span className="schedule-location-chip">
+                            <MapPin size={12} />
+                            <span>{activity.location}</span>
+                          </span>
+                        </div>
+                      </div>
+                    </li>
+                  ))}
+                </ol>
+              )}
             </article>
           );
         })}
       </div>
 
-      <aside className="schedule-confirmation">
-        <div>
-          <span className="schedule-kicker">PLEASE NOTE</span>
-          <h2>Session times are not confirmed yet.</h2>
-          <p>This is a high-level programme outline. The organizers will share confirmed timings and any schedule updates closer to the event.</p>
+      {/* Participant Gear & Flight Kit Checklist */}
+      <section className="schedule-flight-kit-section">
+        <div className="schedule-flight-kit-header">
+          <div className="section-heading">
+            <span className="eyebrow"><span />PARTICIPANT FLIGHT KIT</span>
+            <h2>What to Bring & Mission Checklist</h2>
+          </div>
+          <p className="schedule-flight-kit-lead">
+            Essential gear and preparation requirements for onsite and virtual competitors attending BIAS Bhimtal.
+          </p>
         </div>
-        <div className="schedule-confirmation-date">
-          <CalendarDays size={22} aria-hidden="true" />
-          <span>Closing ceremony<small>16 November · time to be announced</small></span>
+
+        <div className="schedule-flight-kit-grid">
+          <div className="flight-kit-card">
+            <div className="flight-kit-icon">
+              <CheckCircle2 size={20} />
+            </div>
+            <h3>Official Identification</h3>
+            <p>Original College / School Student ID Card, valid Government Photo ID (Aadhar/Passport/DL), and printed or digital BIAS-NSAC registration pass.</p>
+          </div>
+
+          <div className="flight-kit-card">
+            <div className="flight-kit-icon">
+              <Cpu size={20} />
+            </div>
+            <h3>Hardware & Power Gear</h3>
+            <p>Personal laptops, power adaptors, multi-plug extension boards (crucial for team bays), and any specialized microcontrollers or sensors for hardware tracks.</p>
+          </div>
+
+          <div className="flight-kit-card">
+            <div className="flight-kit-icon">
+              <Code2 size={20} />
+            </div>
+            <h3>Pre-Configured Environments</h3>
+            <p>Pre-install your team's code IDEs (VS Code, Android Studio, etc.), Git, Python/Node runtime, and Docker before arrival to ensure zero setup downtime.</p>
+          </div>
+
+          <div className="flight-kit-card">
+            <div className="flight-kit-icon">
+              <Compass size={20} />
+            </div>
+            <h3>Mountain Weather Prep</h3>
+            <p>Bhimtal is nestled in Kumaon hills at ~1,370m altitude. Mid-November evenings range between 12°C–16°C. Light woolens, sweaters, and comfortable shoes are recommended.</p>
+          </div>
+        </div>
+      </section>
+
+      {/* Notice / Advisory Box */}
+      <aside className="schedule-confirmation">
+        <div className="schedule-confirmation-copy">
+          <span className="schedule-kicker">MISSION CONTROL ADVISORY</span>
+          <h2>Live Onsite Schedule Governance</h2>
+          <p>
+            All times listed are in Indian Standard Time (IST). While the core 24-hour development window, code freeze, and jury pitch rounds are fixed, organizers may fine-tune refreshment or break hours based on live hackathon momentum.
+          </p>
+        </div>
+        <div className="schedule-confirmation-actions">
+          <ButtonLink to="/register">Register Team Now</ButtonLink>
+          <ButtonLink to="/venue" secondary>Campus Venue Details</ButtonLink>
         </div>
       </aside>
 
+      {/* Footer Navigation Strip */}
       <div className="schedule-footer-actions">
-        <ButtonLink to="/register">Register your team</ButtonLink>
-        <ButtonLink to="/venue" secondary>Explore the venue</ButtonLink>
+        <ButtonLink to="/problem-statements">
+          <span>Explore 14 Challenges</span>
+          <ArrowRight size={16} />
+        </ButtonLink>
+        <ButtonLink to="/how-to-register" secondary>
+          <span>View Registration Guide</span>
+        </ButtonLink>
       </div>
     </div>
   );
@@ -551,18 +775,63 @@ export function Contact() {
 
       <section className="contact-information" aria-label="Event contact details and venue">
         <article className="contact-information-card">
-          <span className="contact-information-icon"><Mail size={20} aria-hidden="true" /></span>
-          <span className="micro-label">EVENT EMAIL</span>
-          <h2>Organizer email</h2>
-          <p className="contact-placeholder-value">To be announced</p>
-          <p className="contact-information-note">A verified event email will be added here when provided.</p>
+          <span className="contact-information-icon"><MessageCircle size={20} aria-hidden="true" /></span>
+          <span className="micro-label">WHATSAPP · DIRECT CHAT</span>
+          <h2>Message the team</h2>
+          <div className="contact-person-list">
+            {organizerContacts.map((contact) => (
+              <div key={contact.name} className="contact-person-item">
+                <div className="contact-person-meta">
+                  <strong className="contact-person-name">{contact.name}</strong>
+                  <span className="contact-role-badge">{contact.role}</span>
+                </div>
+                <div className="contact-person-actions">
+                  <a
+                    className="contact-whatsapp-link"
+                    href={contact.whatsappUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    <MessageCircle size={14} />
+                    <span>Chat on WhatsApp</span>
+                    <ArrowUpRight size={13} />
+                  </a>
+                  <a
+                    className="contact-phone-link"
+                    href={`tel:${contact.phone.replace(/\s+/g, '')}`}
+                  >
+                    <Phone size={13} />
+                    <span>{contact.displayPhone}</span>
+                  </a>
+                </div>
+              </div>
+            ))}
+          </div>
         </article>
         <article className="contact-information-card">
-          <span className="contact-information-icon"><Phone size={20} aria-hidden="true" /></span>
-          <span className="micro-label">PHONE & MESSAGING</span>
-          <h2>Organizer phone</h2>
-          <p className="contact-placeholder-value">To be announced</p>
-          <p className="contact-information-note">No event contact number has been confirmed yet.</p>
+          <span className="contact-information-icon"><Mail size={20} aria-hidden="true" /></span>
+          <span className="micro-label">OFFICIAL EMAIL CHANNELS</span>
+          <h2>Send us an email</h2>
+          <div className="contact-person-list">
+            {organizerContacts.map((contact) => (
+              <div key={contact.name} className="contact-person-item">
+                <div className="contact-person-meta">
+                  <strong className="contact-person-name">{contact.name}</strong>
+                  <span className="contact-role-badge">{contact.role}</span>
+                </div>
+                <div className="contact-person-actions">
+                  <a
+                    className="contact-email-link"
+                    href={`mailto:${contact.email}`}
+                  >
+                    <Mail size={14} />
+                    <span>{contact.email}</span>
+                    <ArrowUpRight size={13} />
+                  </a>
+                </div>
+              </div>
+            ))}
+          </div>
         </article>
         <article className="contact-information-card contact-venue-card">
           <span className="contact-information-icon"><MapPin size={20} aria-hidden="true" /></span>

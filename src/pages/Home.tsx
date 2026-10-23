@@ -33,9 +33,10 @@ import {
   Eye,
   Camera,
   Maximize2,
+  Phone,
 } from 'lucide-react';
 import { ButtonLink, SectionHeading } from '../components/UI';
-import { directionsUrl, gallery, officialUrl, schedule, venueMapEmbedUrl } from '../data/event';
+import { directionsUrl, gallery, officialUrl, organizerContacts, schedule, venueMapEmbedUrl } from '../data/event';
 import { questions } from '../data/quiz';
 import { problemStatements } from '../data/problem-statements';
 
@@ -1135,48 +1136,84 @@ export default function Home() {
       <section id="contact" className="section home-contact immersive-section">
         <div className="home-contact-heading">
           <SectionHeading eyebrow="WE'RE HERE TO HELP" title="Need a hand? Talk to the organizers.">
-            Questions about registration or the event? Reach out through one of the organizer contact channels.
+            Questions about team registration, challenge rules, or campus arrival? Connect directly with our faculty coordinator, student head, or technical support desk.
           </SectionHeading>
         </div>
         <div className="home-contact-grid">
+          {/* Tile 1: WhatsApp & Phone Support */}
           <article className="home-contact-card">
             <div className="home-contact-card-heading">
-              <MessageCircle size={21} aria-hidden="true" />
+              <MessageCircle size={22} aria-hidden="true" />
               <div>
-                <span className="micro-label">WHATSAPP · INDIA</span>
+                <span className="micro-label">WHATSAPP · DIRECT CHAT</span>
                 <h3>Message the team</h3>
               </div>
             </div>
-            <p>Organizer WhatsApp contact details will be announced here when confirmed.</p>
-            <span className="contact-card-note">No contact number has been published yet.</span>
+            <p>Direct WhatsApp messaging for urgent questions, quick queries, and registration assistance.</p>
+            <div className="contact-person-list">
+              {organizerContacts.map((contact) => (
+                <div key={contact.name} className="contact-person-item">
+                  <div className="contact-person-meta">
+                    <strong className="contact-person-name">{contact.name}</strong>
+                    <span className="contact-role-badge">{contact.role}</span>
+                  </div>
+                  <div className="contact-person-actions">
+                    <a
+                      className="contact-whatsapp-link"
+                      href={contact.whatsappUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      title={`Chat with ${contact.name} on WhatsApp`}
+                    >
+                      <MessageCircle size={15} />
+                      <span>Chat on WhatsApp</span>
+                      <ArrowUpRight size={13} />
+                    </a>
+                    <a
+                      className="contact-phone-link"
+                      href={`tel:${contact.phone.replace(/\s+/g, '')}`}
+                      title={`Call ${contact.name}`}
+                    >
+                      <Phone size={13} />
+                      <span>{contact.displayPhone}</span>
+                    </a>
+                  </div>
+                </div>
+              ))}
+            </div>
           </article>
+
+          {/* Tile 2: Official Email Support */}
           <article className="home-contact-card">
             <div className="home-contact-card-heading">
-              <Mail size={21} aria-hidden="true" />
+              <Mail size={22} aria-hidden="true" />
               <div>
-                <span className="micro-label">EMAIL</span>
+                <span className="micro-label">EMAIL · OFFICIAL INQUIRIES</span>
                 <h3>Send us an email</h3>
               </div>
             </div>
-            <p>For event and registration questions.</p>
-            <strong className="contact-email-placeholder">Organizer email to be announced</strong>
-            <span className="contact-card-note">No event email has been published yet.</span>
-          </article>
-          <article className="home-contact-card home-contact-event">
-            <div className="home-contact-card-heading">
-              <MapPin size={21} aria-hidden="true" />
-              <div>
-                <span className="micro-label">EVENT INFORMATION</span>
-                <h3>Find us in Bhimtal</h3>
-              </div>
+            <p>For verified communications, formal permissions, academic queries, and sponsorship support.</p>
+            <div className="contact-person-list">
+              {organizerContacts.map((contact) => (
+                <div key={contact.name} className="contact-person-item">
+                  <div className="contact-person-meta">
+                    <strong className="contact-person-name">{contact.name}</strong>
+                    <span className="contact-role-badge">{contact.role}</span>
+                  </div>
+                  <div className="contact-person-actions">
+                    <a
+                      className="contact-email-link"
+                      href={`mailto:${contact.email}`}
+                      title={`Send email to ${contact.name}`}
+                    >
+                      <Mail size={14} />
+                      <span>{contact.email}</span>
+                      <ArrowUpRight size={13} />
+                    </a>
+                  </div>
+                </div>
+              ))}
             </div>
-            <p>ASTROVERSE · NASA International Space Apps Challenge 2026</p>
-            <strong>Birla Institute of Applied Sciences</strong>
-            <span>Bhimtal, Uttarakhand, India</span>
-            <span className="home-contact-event-date">14–16 November 2026</span>
-            <a className="home-contact-directions" href={directionsUrl} target="_blank" rel="noreferrer">
-              View directions <ArrowUpRight size={16} aria-hidden="true" />
-            </a>
           </article>
         </div>
       </section>
